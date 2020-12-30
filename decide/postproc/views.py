@@ -16,6 +16,17 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
 
+    def sin_paridad(self, options):
+
+        out = []
+
+        for opt in options:
+
+            out.append({
+                **opt,
+                'paridad': [],
+            })
+            
     def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
