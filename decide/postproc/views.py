@@ -29,11 +29,19 @@ class PostProcView(APIView):
 
         for i in out:
 
-            escanos = i['postproc']
+            escanyos = i['postproc']
+            presentados = i['presentados']
+            x = 0
 
-            candidatos = i['candidatos']
+            while escanyos > 0:
+              
 
-            a = 0
+                i['paridad'].append(presentados[x])
+                x = x + 1
+
+                escanyos = escanyos - 1 
+
+        return out
             
     def post(self, request):
         """
