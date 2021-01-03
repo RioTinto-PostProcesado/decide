@@ -26,6 +26,14 @@ class PostProcView(APIView):
                 **opt,
                 'paridad': [],
             })
+
+        for i in out:
+
+            escanos = i['postproc']
+
+            candidatos = i['candidatos']
+
+            a = 0
             
     def post(self, request):
         """
