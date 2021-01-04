@@ -68,10 +68,14 @@ class PostProcView(APIView):
            ]
         """
 
-        t = request.data.get('type', 'IDENTITY')
-        opts = request.data.get('options', [])
+        typeOfData = request.data.get('type')
+        options =  request.data.get('options', [])
 
-        if t == 'IDENTITY':
-            return self.identity(opts)
+        if typeOfData == 'IDENTITY':
+            return self.identity(options)
 
+        elif typeOfData == 'SIN_PARIDAD':    
+            
+            return Response(self.sin_paridad(options))
+           
         return Response({})
