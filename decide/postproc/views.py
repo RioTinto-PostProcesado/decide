@@ -15,6 +15,27 @@ class PostProcView(APIView):
 
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
+    
+    def borda(self, options):
+
+        #Añadimos total para todas las opciones
+        for opt in options:
+            opt['total'] = 0
+
+        #Agrupamos las opciones segun su grupo de votación
+        grp = self.groups(options)
+        res = []
+
+        #Ordenamos las opciones según el número de votos 
+        for g in grp:
+            lista = sorted(grp[g], key = lambda x:x["votes"])
+            votosTotales = 0
+
+            #Obtenemos la suma todos los votos
+            for lis in lista:
+                votosTotales +=  lis["votes"]
+            
+            cont = 1
 
     def post(self, request):
         """
