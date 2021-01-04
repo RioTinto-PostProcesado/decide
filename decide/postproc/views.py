@@ -18,6 +18,7 @@ class PostProcView(APIView):
 
 
     def paridad(self, options):
+
         out = []
 
         for opt in options:
@@ -35,14 +36,40 @@ class PostProcView(APIView):
             m=0
             paridad = True
 
+            # Almacenamos en dos listas los hombres y las mujeres
             for candi in candidatos:
                 if candi['sexo'] == 'hombre':
-                    listaHombres.append(cand)
+                    listaHombres.append(candi)
                 elif candi['sexo'] == 'mujer':
-                    listaMujeres.append(cand)
-                    
-            
+                    listaMujeres.append(candi)
+
+            check = self.checkPorcentajeParidad(listaHombres, listaMujeres)
+
+            if ~check:
+                out = {'message' : 'No se cumplen los ratios de paridad 60%-40%'}
+                break
+
+            # Recorremos todos los escanios disponibles      
+            while escanios > 0:
+                # Si existe paridad en ese momento
+                if paridad:
+                    # Si la cantidad de mujeres incluidas es menor que la cantidad de mujeres
+                    if m < len(listaMujeres):
+                        i['paridad'].append(listaMujeres[m])
+                        m = m + 1
+                    # Si no, se aniade un hombre y se pone la paridad a False
+                    else:
+                        i['paridad'].append(listaHombres[h])
+                        h = h + 1
+                    paridad = False
+               
+                # Cuenta regresiva de los escanios    
+                escanios -= 1
         return out
+
+
+    
+
 
     def post(self, request):
         """
@@ -64,10 +91,7 @@ class PostProcView(APIView):
             return self.identity(options)
 
         elif typeOfData == 'PARIDAD':
-            check = self.check_json(options)
-            if check:
-                return Response(self.paridad(options))
-            else:
-                return Response({'message' : 'No se cumplen los ratios de paridad 60%-40%'})
+            return Response(self.paridad(options))
+            
 
         return Response({})
