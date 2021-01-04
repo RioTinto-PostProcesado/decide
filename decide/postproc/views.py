@@ -44,11 +44,23 @@ class PostProcView(APIView):
         return out
 
     def porcentaje_hombre_mujer(self, hombres, mujeres):
+        
+        """
+        Metodo que devolverá:
+            True: Si el porcentaje de hombres y mujeres está equilibrado entre 60%-40%
+            False: En caso contrario
 
+        Inputs: 
+            hombres: Array con los hombres candidatos en la votación
+            mujeres: Array con las mujeres candidatas en la votación
+        """
+
+        #Obtenemos el total de participantes y sus porcentajes según sexo
         total = len(hombres) + len(mujeres)
         porcentaje_hombres = len(hombres)/total
         porcentaje_mujeres = len(mujeres)/total
 
+        #Si se cumplen las estadísticas determinadas devolveremos True, en caso contrario, False
         if (porcentaje_hombres < 0.4) | (porcentaje_mujeres < 0.4):
             return False
         else:
