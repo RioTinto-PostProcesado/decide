@@ -17,12 +17,26 @@ class PostProcView(APIView):
         return Response(out)
 
 
-    def dhont(self, options, escanio):
-        #Añadimos escaños para todas las opciones
+    def dhondt(self, options, escanio):
+        """
+        Sistema d'Hondt es un método para asignar escaños en las listas electorales. 
+        Se caracteriza por dividir sucesivamente los totales de los votos obtenidos por los distintos partidos
+        y asignándo los escaños a los promedios más altos.
+         *escanio:10 
+         * options: [
+            {
+             option: Option 1,
+             number: 1,
+             votes: 20,
+            }
+           ]
+        """
+        #Para cada opcion se le añaden escaños
         for opt in options:
             opt['escanio'] = 0
 
-        #Para cada escaño se hacen los calculos para averiguar que opción tiene el mayor cociente, el que tenga el mayor, se lleva el escaño
+        #Para asignar escaños, se realiza la división entre los vosotros que tiene cada opción y los escaños (inicialmente se divide entre 1)
+        #El mayor cociente se lleva el escaño
         for i in range(escanio):
             max(options, 
                 key = lambda x : x['votes'] / (x['escanio'] + 1.0))['escanio'] += 1
@@ -44,16 +58,16 @@ class PostProcView(APIView):
            ]
         """
 
-        t = request.data.get('type', 'IDENTITY')
-        opts = request.data.get('options', [])
+        typeOfData = request.data.get('type', 'IDENTITY')
+        options = request.data.get('options', [])
 
 
-        if t == 'IDENTITY':
-            return self.identity(opts)
+        if typeOfData == 'IDENTITY':
+            return self.identity(options)
 
-        if t == 'DHONDT':
-            escanio = int(float(request.data.get('escanio', '5')))
-            return self.dhont(opts, escanio)
+        if typeOfData == 'DHONDT':
+            escanio = int(float(request.data.get('escanio', int )))
+            return self.dhondt(options, escanio)
 
 
         return Response({})
