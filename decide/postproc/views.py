@@ -42,7 +42,19 @@ class PostProcView(APIView):
                 escanyos = escanyos - 1 
 
         return out
-            
+
+    def porcentaje_hombre_mujer(self, hombres, mujeres):
+
+        total = len(hombres) + len(mujeres)
+        porcentaje_hombres = len(hombres)/total
+        porcentaje_mujeres = len(mujeres)/total
+
+        if (porcentaje_hombres < 0.4) | (porcentaje_mujeres < 0.4):
+            return False
+        else:
+            return True
+
+
     def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
