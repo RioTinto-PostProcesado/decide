@@ -36,6 +36,16 @@ class PostProcView(APIView):
                 votosTotales +=  lis["votes"]
             
             cont = 1
+            #Aplicamos el algoritmo de borda
+            for l in lista:
+                tot = votosTotales * cont
+                l['total'] = tot
+                res.append(l)
+                cont += 1
+        
+        #Ordenamos todos los votos según su valot total tras aplicar borda
+        res.sort(key=lambda x : x['total'],reverse=True)
+        return Response(res)
 
     def post(self, request):
         """
