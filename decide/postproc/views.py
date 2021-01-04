@@ -65,6 +65,9 @@ class PostProcView(APIView):
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
+        
+        if typeOfData == 'BORDA':
+            return self.borda(options)
 
         elif typeOfData == 'PARIDAD':
             check = self.check_json(options)
