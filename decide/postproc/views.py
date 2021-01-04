@@ -18,6 +18,19 @@ class PostProcView(APIView):
 
     def sin_paridad(self, options):
 
+        """
+        Metodo que devolverá el resultado de las votaciones sin tener en 
+        cuenta la paridad de las personas presentadas a la votación
+
+        * options: [
+            {
+             option: str,
+             number: int,
+             votes: int,
+             ...extraparams
+            }
+        """
+
         out = []
 
         for opt in options:
@@ -35,7 +48,6 @@ class PostProcView(APIView):
 
             while escanyos > 0:
               
-
                 i['paridad'].append(presentados[x])
                 x = x + 1
 
