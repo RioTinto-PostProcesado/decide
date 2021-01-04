@@ -63,12 +63,21 @@ class PostProcView(APIView):
                         h = h + 1
                     paridad = False
                
+                # Si no existe paridad en ese momento   
+                else:
+                    # Si el numero de hombres es menor que el numero de hombres en la lista, se aniade un hombre
+                    if h < len(listaHombres):
+                        i['paridad'].append(listaHombres[h])
+                        h = h + 1
+                    # En caso contrario, se aniade una mujer y vuelve a existir paridad en la lista
+                    else:
+                        i['paridad'].append(listaMujeres[m])
+                        m = m + 1  
+                    paridad = True
+                    
                 # Cuenta regresiva de los escanios    
                 escanios -= 1
         return out
-
-
-    
 
 
     def post(self, request):
@@ -93,5 +102,4 @@ class PostProcView(APIView):
         elif typeOfData == 'PARIDAD':
             return Response(self.paridad(options))
             
-
         return Response({})
