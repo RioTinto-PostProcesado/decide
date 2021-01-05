@@ -99,6 +99,9 @@ def post(self, request):
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
+        elif t == 'SAINTE':
+            return Response(self.sainteLague(opts, s))    
+
         elif typeOfData == 'PARIDAD':
             check = self.check_json(options)
             if check:
