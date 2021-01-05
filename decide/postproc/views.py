@@ -80,6 +80,18 @@ class PostProcView(APIView):
         return out
 
 
+    def checkPorcentajeParidad(self, hombres, mujeres):
+
+        total = len(hombres)+len(mujeres)
+        porcentajeHombres = len(hombres)/total
+        porcentajeMujeres = len(mujeres)/total
+
+        if (porcentajeMujeres < 0.4) | (porcentajeHombres < 0.4):
+            return False
+        else:
+            return True
+
+
     def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
