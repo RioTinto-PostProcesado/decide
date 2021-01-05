@@ -20,6 +20,20 @@ class PostProcView(APIView):
 
 def sainteLague(self, options, seats):
 
+
+    """
+        Metodo que devolverá el resultado de las votaciones ordenando los resultados
+        por escaños o asientos, pero usando como divisores los números impares.
+
+        * options: [
+            {
+             option: str,
+             number: int,
+             votes: int,
+             ...extraparams
+            }
+    """
+
         out = []
 
         for opt in options:
@@ -59,6 +73,12 @@ def sainteLague(self, options, seats):
                     actual = i;
 
                     odd= odd + 2;
+
+                out[actual]['postproc'] = out[actual]['postproc'] + 1;  #Le concede un escaño a la opcion
+
+            se = se - 1;     #Va descontando escaños
+            
+        return out    
 
 def post(self, request):
         """
