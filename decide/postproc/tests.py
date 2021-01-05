@@ -42,3 +42,43 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
+
+    def testNoParidad(self):
+        data = {
+            'type': 'PARIDAD',
+            'options': [
+                { 'option': 'Partido rojo', 'number': 1, 'votes': 120 , 'postproc': 4, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'hombre','id':'4'}
+                ]},
+                { 'option': 'Partido azul', 'number': 2, 'votes': 89, 'postproc': 3, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'mujer','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ]},
+                { 'option': 'Partido naranja', 'number': 3, 'votes': 10, 'postproc': 2, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ]},
+                { 'option': 'Partido morado', 'number': 5, 'votes': 26, 'postproc': 1, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ]},
+            ]
+        }
+
+        expected_result = {'message' : 'No se cumplen los ratios de paridad 60%-40%'}
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
