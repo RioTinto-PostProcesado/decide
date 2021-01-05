@@ -46,14 +46,14 @@ class PostProcTestCase(APITestCase):
     
     def testNoParidad(self):
         """
-            Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
-            Entrada: Votacion
+            * Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
+            * Entrada: Votacion
                 - Option: Nombre del partido
                 - Number: Id de la opcion
                 - Votes: Numero de votos de esa votacion
                 - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
                 - Candidatos: Sexo e ID de los candidatos
-            Salida: Codigo 200 con mensaje de que no se cumple la paridad
+            * Salida: Codigo 200 con mensaje de que no se cumple la paridad
         """
         data = {
             'type': 'PARIDAD',
@@ -96,14 +96,14 @@ class PostProcTestCase(APITestCase):
 
     def testParidadBien(self):
         """
-            Definicion: Test positivo para una votacion que cumple la paridad
-            Entrada: Votacion
+            * Definicion: Test positivo para una votacion que cumple la paridad
+            * Entrada: Votacion (Json)
                 - Option: Nombre del partido
                 - Number: Id de la opcion
                 - Votes: Numero de votos de esa votacion
                 - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
                 - Candidatos: Sexo e ID de los candidatos
-            Salida: Codigo 200 y json de la paridad
+            * Salida: Codigo 200 y json de la paridad
         """
         data = {
             'type': 'PARIDAD',
