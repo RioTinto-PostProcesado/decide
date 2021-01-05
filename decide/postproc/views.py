@@ -32,6 +32,16 @@ def sainteLague(self, options, seats):
 
         out.sort(key=lambda x: -x['votes'])
 
+        se = seats;       #Numero de escaños (asientos) totales
+
+        while se > 0:
+
+            i = 1;
+
+            odd= 1;      #Genera que los dividores sean siempre impares
+
+            actual = 0;
+
 def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
