@@ -42,6 +42,24 @@ def sainteLague(self, options, seats):
 
             actual = 0;
 
+            while i < len(out):
+
+                valor1 = out[actual]['votes'] / (out[actual]['postproc'] + odd);
+
+                comparador = out[i]['votes'] / (out[i]['postproc'] + odd);
+
+                if (valor1 >= comparador):
+
+                    i = i + 1;
+
+                    odd= odd + 2;
+
+                else:
+
+                    actual = i;
+
+                    odd= odd + 2;
+
 def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
