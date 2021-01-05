@@ -46,7 +46,7 @@ class PostProcView(APIView):
 
     def post(self, request):
         """
-         * type: IDENTITY | EQUALITY | WEIGHT
+         * type: IDENTITY | ORDER
          * options: [
             {
              option: str,
@@ -57,10 +57,13 @@ class PostProcView(APIView):
            ]
         """
 
-        t = request.data.get('type', 'IDENTITY')
+        t = request.data.get('type')
         opts = request.data.get('options', [])
 
         if t == 'IDENTITY':
             return self.identity(opts)
+        
+        elif t == 'ORDER':
+            return Response(self.order(opts))
 
         return Response({})
