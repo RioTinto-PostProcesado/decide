@@ -45,7 +45,7 @@ class PostProcView(APIView):
 
             check = self.checkPorcentajeParidad(listaHombres, listaMujeres)
 
-            if ~check:
+            if not check:
                 out = {'message' : 'No se cumplen los ratios de paridad 60%-40%'}
                 break
 
@@ -83,13 +83,11 @@ class PostProcView(APIView):
     def checkPorcentajeParidad(self, hombres, mujeres):
 
         total = len(hombres)+len(mujeres)
+       
         porcentajeHombres = len(hombres)/total
         porcentajeMujeres = len(mujeres)/total
 
-        if (porcentajeMujeres < 0.4) | (porcentajeHombres < 0.4):
-            return False
-        else:
-            return True
+        return not (porcentajeMujeres < 0.4 or porcentajeHombres < 0.4)
 
 
     def post(self, request):
