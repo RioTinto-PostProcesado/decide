@@ -46,7 +46,7 @@ class PostProcView(APIView):
 
     def post(self, request):
         """
-         * type: IDENTITY | EQUALITY | WEIGHT
+         * type: IDENTITY | PARIDAD | ORDER
          * options: [
             {
              option: str,
@@ -69,5 +69,8 @@ class PostProcView(APIView):
                 return Response(self.paridad(options))
             else:
                 return Response({'message' : 'No se cumplen los ratios de paridad 60%-40%'})
+        
+        elif typeOfData == 'ORDER':
+            return Response(self.order(opts))
 
         return Response({})
