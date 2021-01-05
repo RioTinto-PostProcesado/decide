@@ -28,12 +28,7 @@ class PostProcView(APIView):
 
         out.sort(key=lambda x: -x['votes'])
 
-        votesTotal=0
-
-        for votes in out:
-            votesTotal=votesTotal+votes['votes']
-
-        max=len(options)*votesTotal
+        max=len(options)*1000
 
         a=0
 
@@ -63,14 +58,14 @@ class PostProcView(APIView):
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
-        elif typeOfData == 'PARIDAD':
+        if typeOfData == 'PARIDAD':
             check = self.check_json(options)
             if check:
                 return Response(self.paridad(options))
             else:
                 return Response({'message' : 'No se cumplen los ratios de paridad 60%-40%'})
         
-        elif typeOfData == 'ORDER':
-            return Response(self.order(opts))
+        if typeOfData == 'ORDER':
+            return Response(self.order(options))
 
         return Response({})
