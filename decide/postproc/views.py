@@ -16,6 +16,25 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
     
+    def groups(self, options):
+        groups = set()
+        grpOptions = {}
+        
+        #Obtener grupos
+        for opt in options:
+            groups.add(opt["group"])
+             
+        #Inicializar listas de opciones
+        for group in groups:
+            grpOptions[group] = []      
+
+        #Categorizar opciones por grupo
+        for opt in options:
+            grpOptions[opt.get("group")].append(opt)
+
+        return grpOptions
+        
+
     def borda(self, options):
 
         #Añadimos total para todas las opciones
