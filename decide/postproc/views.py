@@ -16,7 +16,23 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
 
-    def post(self, request):
+
+
+def sainteLague(self, options, seats):
+
+        out = []
+
+        for opt in options:
+
+            out.append({
+                **opt,
+
+                'postproc': 0,
+            })
+
+        out.sort(key=lambda x: -x['votes'])
+
+def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
          * options: [
