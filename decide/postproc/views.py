@@ -25,9 +25,23 @@ class PostProcView(APIView):
                 'postproc': 0,
             });
 
+        out.sort(key=lambda x: -x['votes'])
 
+        votesTotal=0
 
-        return Response(out)
+        for votes in out:
+            votesTotal=votesTotal+votes['votes']
+
+        max=len(options)*votesTotal
+
+        a=0
+
+        while a < len(out):
+            postproc_a=max-out[a]['votes']
+            out[a]['postproc']=postproc_a
+            a=a+1
+
+        return out
 
     def post(self, request):
         """
