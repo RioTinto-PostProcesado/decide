@@ -18,6 +18,11 @@ class PostProcView(APIView):
 
 
     def paridad(self, options):
+        """
+            * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
+            * Entrada: Json de la votacion
+            * Salida: Lista de candidatos ordenada si hay paridad, mensaje de error si no hay paridad
+        """
 
         out = []
 
@@ -81,7 +86,11 @@ class PostProcView(APIView):
 
 
     def checkPorcentajeParidad(self, hombres, mujeres):
-
+        """
+            * Definicion: Comprueba si se cumplen los porcentajes minimos de hombres y mujeres
+            * Entrada: Lista de hombres y de mujeres en la votacion
+            * Salida: True si se cumple la paridad, False si no se cumple
+        """
         total = len(hombres)+len(mujeres)
        
         porcentajeHombres = len(hombres)/total
