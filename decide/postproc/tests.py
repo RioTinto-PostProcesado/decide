@@ -83,3 +83,19 @@ def test_borda(self):
                 
             ]
         }
+
+        expected_result = [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1", "total":66 },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1", "total":44},
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g2", "total": 39},
+                { "option": "Option 2", "number": 5, "votes": 3, "group":"g2", "total": 26},
+                { "option": "Option 1", "number": 1, "votes": 5, "group":"g1", "total": 22},
+                { "option": "Option 3", "number": 6, "votes": 2, "group":"g2", "total": 13}
+                
+            ]
+
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
