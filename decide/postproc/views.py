@@ -22,9 +22,7 @@ def sainteLague(self, options, seats):
 
 
     """
-        Metodo que devolverá el resultado de las votaciones ordenando los resultados
-        por escaños o asientos, pero usando como divisores los números impares.
-
+    
         * options: [
             {
              option: str,
@@ -32,6 +30,14 @@ def sainteLague(self, options, seats):
              votes: int,
              ...extraparams
             }
+
+        Definición:   Metodo que devolverá el resultado de las votaciones ordenando los resultados
+        por escaños o asientos, pero usando como divisores los números impares, para una mayor representación
+        de partidos o canditatos con menos votos. 
+
+        Entrada: votos totales por cada eleccion y el numero de asientos o escaños
+
+        Salida: lista con los partidos y los asientos asignados
     """
 
         out = []
