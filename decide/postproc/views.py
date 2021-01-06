@@ -17,6 +17,7 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
     
+
     def order(self, options):
         out = []
 
@@ -39,6 +40,38 @@ class PostProcView(APIView):
 
         return out
 
+    def borda(self, options):
+
+        #Añadimos total para todas las opciones
+        for opt in options:
+            opt['total'] = 0
+
+        #Agrupamos las opciones segun su grupo de votación
+        grp = self.groups(options)
+        res = []
+
+        #Ordenamos las opciones según el número de votos 
+        for g in grp:
+            lista = sorted(grp[g], key = lambda x:x["votes"])
+            votosTotales = 0
+
+            #Obtenemos la suma todos los votos
+            for lis in lista:
+                votosTotales +=  lis["votes"]
+            
+            cont = 1
+            #Aplicamos el algoritmo de borda
+            for l in lista:
+                tot = votosTotales * cont
+                l['total'] = tot
+                res.append(l)
+                cont += 1
+        
+        #Ordenamos todos los votos según su valot total tras aplicar borda
+        res.sort(key=lambda x : x['total'],reverse=True)
+        return Response(res)
+
+
     def post(self, request):
         """
          * type: IDENTITY | PARIDAD | ORDER
@@ -57,6 +90,9 @@ class PostProcView(APIView):
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
+        
+        if typeOfData == 'BORDA':
+            return self.borda(options)
 
         if typeOfData == 'PARIDAD':
             check = self.check_json(options)
