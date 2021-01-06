@@ -42,9 +42,8 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-
-    
-    def testNoParidad(self):
+        
+  def testNoParidad(self):
         """
             * Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
             * Entrada: Votacion
@@ -92,56 +91,7 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-
-
-    def testParidadBien(self):
-        """
-            * Definicion: Test positivo para una votacion que cumple la paridad
-            * Entrada: Votacion (Json)
-                - Option: Nombre del partido
-                - Number: Id de la opcion
-                - Votes: Numero de votos de esa votacion
-                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
-                - Candidatos: Sexo e ID de los candidatos
-            * Salida: Codigo 200 y json de la paridad
-        """
-        data = {
-            'type': 'PARIDAD',
-            'options': [
-                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
-                 {'sexo':'hombre','id':'1'}
-                ,{'sexo':'mujer','id':'2'}
-                ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ]}
-            ]
-        }
-
-        expected_result = [
-            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
-                 {'sexo':'hombre','id':'1'}
-                ,{'sexo':'mujer','id':'2'}
-                ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ],
-                'paridad': [
-                 {'sexo':'mujer','id':'2'}
-                ,{'sexo':'hombre','id':'1'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'5'}
-                ]}
-        ]
         
-        response = self.client.post('/postproc/', data, format='json')
-        self.assertEqual(response.status_code, 200)
-
-        values = response.json()
-        self.assertEqual(values, expected_result)
-
-    
     def testParidadFalla(self):
         """
             * Definicion: Test negativo por poner mal la URL
@@ -169,8 +119,57 @@ class PostProcTestCase(APITestCase):
         response = self.client.post('/postproci/', data, format='json')
         self.assertEqual(response.status_code, 404)
 
+        
+    def testParidadBien(self):
+        """
+            * Definicion: Test positivo para una votacion que cumple la paridad
+            * Entrada: Votacion (Json)
+                - Option: Nombre del partido
+                - Number: Id de la opcion
+                - Votes: Numero de votos de esa votacion
+                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
+                - Candidatos: Sexo e ID de los candidatos
+            * Salida: Codigo 200 y json de la paridad
+        """
+        data = {
+            'type': 'PARIDAD',
+            'options': [
+                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
 
-    def testParidad1Elemento(self):
+            ]
+        }
+
+        expected_result = [   
+         { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ],
+                'paridad': [
+                 {'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
+        ]
+       
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+    
+    
+     def testParidad1Elemento(self):
         """
             * Definicion: Test positivo con solo un candidato de todos los posibles
             * Entrada: Votacion (Json)
@@ -212,3 +211,96 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+        
+          
+    def test_SainteLague1(self):
+        data = {
+            'type': 'SAINTE',
+            'seats': 12,
+            'options': [
+                { 'option': 'Partido 1', 'number': 1, 'votes': 50 },
+                { 'option': 'Partido 2', 'number': 2, 'votes': 60 },
+                { 'option': 'Partido 3', 'number': 3, 'votes': 35 },
+                { 'option': 'Partido 4', 'number': 4, 'votes': 15 },
+                { 'option': 'Partido 5', 'number': 5, 'votes': 56 },
+                { 'option': 'Partido 6', 'number': 6, 'votes': 180 },
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Partido 6', 'number': 6, 'votes': 180, 'postproc': 5 },
+            { 'option': 'Partido 2', 'number': 2, 'votes': 60, 'postproc': 2 },
+            { 'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 2 },
+            { 'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 2 },
+            { 'option': 'Partido 3', 'number': 3, 'votes': 35, 'postproc': 1 },
+            { 'option': 'Partido 4', 'number': 4, 'votes': 15, 'postproc': 0 },
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+        
+
+    def test_SainteLague2(self):
+        data = {
+            'type': 'SAINTE',
+            'seats': 12,
+            'options': [
+                { 'option': 'Partido 1', 'number': 1, 'votes': 50 },
+                { 'option': 'Partido 2', 'number': 2, 'votes': 10 },
+                { 'option': 'Partido 3', 'number': 3, 'votes': 34 },
+                { 'option': 'Partido 4', 'number': 4, 'votes': 25 },
+                { 'option': 'Partido 5', 'number': 5, 'votes': 56 },
+                { 'option': 'Partido 6', 'number': 6, 'votes': 170 },
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Partido 6', 'number': 6, 'votes': 170, 'postproc': 6 },
+            { 'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 2 },
+            { 'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 2 },
+            { 'option': 'Partido 3', 'number': 3, 'votes': 34, 'postproc': 1 },
+            { 'option': 'Partido 4', 'number': 4, 'votes': 25, 'postproc': 1 },
+            { 'option': 'Partido 2', 'number': 2, 'votes': 10, 'postproc': 0 },
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+
+    def test_dhondt(self):
+        data = {
+            "type": "DHONDT",
+            "escanio": "8",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 5 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 3 },
+                { "option": "Option 4", "number": 4, "votes": 2 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+                { "option": "Option 6", "number": 6, "votes": 1 },
+            ]
+        }
+        data = {
+            "type": "DHONDT",
+            "escanio": "10",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 20 },
+                { "option": "Option 2", "number": 2, "votes": 11 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 10 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+            ]
+        }
+    
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
