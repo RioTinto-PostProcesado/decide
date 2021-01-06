@@ -16,7 +16,7 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
 
-
+    
     def dhondt(self, options, escanio):
         """
         Sistema d'Hondt es un método para asignar escaños en las listas electorales. 
@@ -45,6 +45,7 @@ class PostProcView(APIView):
         options.sort(key=lambda x: -x['escanio'])
         return Response(options)
 
+
     def post(self, request):
         """
          * type: IDENTITY | EQUALITY | WEIGHT
@@ -65,9 +66,10 @@ class PostProcView(APIView):
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
-        if typeOfData == 'DHONDT':
+        
+        elif typeOfData == 'DHONDT':
             escanio = int(float(request.data.get('escanio', int )))
             return self.dhondt(options, escanio)
-
-
+            
+            
         return Response({})
