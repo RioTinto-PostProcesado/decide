@@ -71,12 +71,8 @@ class PostProcView(APIView):
         res.sort(key=lambda x : x['total'],reverse=True)
         return Response(res)
 
-
-
-
-def sainteLague(self, options, seats):
-
-
+      
+    def sainteLague(self, options, seats):
     """
     
         * options: [
@@ -87,14 +83,21 @@ def sainteLague(self, options, seats):
              ...extraparams
             }
 
-        Definición:   Metodo que devolverá el resultado de las votaciones ordenando los resultados
+        * Definición:   Metodo que devolverá el resultado de las votaciones ordenando los resultados
         por escaños o asientos, pero usando como divisores los números impares, para una mayor representación
         de partidos o canditatos con menos votos. 
 
-        Entrada: votos totales por cada eleccion y el numero de asientos o escaños
+        * Entrada: votos totales por cada eleccion y el numero de asientos o escaños
 
-        Salida: lista con los partidos y los asientos asignados
+        * Salida: lista con los partidos y los asientos asignados
     """
+
+    def paridad(self, options):
+        """
+            * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
+            * Entrada: Json de la votacion
+            * Salida: Lista de candidatos ordenada si hay paridad, mensaje de error si no hay paridad
+        """
 
         out = []
 
@@ -142,43 +145,119 @@ def sainteLague(self, options, seats):
             
         return out    
 
-def post(self, request):
+      
+    def paridad(self, options):
         """
-         * type: IDENTITY | PARIDAD | ORDER
-         * options: [
-            {
-             option: str,
-             number: int,
-             votes: int,
-             ...extraparams
-            }
-           ]
+            * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
+            * Entrada: Json de la votacion
+            * Salida: Lista de candidatos ordenada si hay paridad, mensaje de error si no hay paridad
+        """
+
+        out = []
+
+        for opt in options:
+            out.append({
+                **opt,
+                'paridad': [],
+            })
+                    
+        for i in out:
+            escanios = i['postproc']
+            candidatos = i['candidatos']
+            listaHombres = []
+            listaMujeres = []
+            h=0
+            m=0
+            paridad = True
+
+            # Almacenamos en dos listas los hombres y las mujeres
+            for candi in candidatos:
+                if candi['sexo'] == 'hombre':
+                    listaHombres.append(candi)
+                elif candi['sexo'] == 'mujer':
+                    listaMujeres.append(candi)
+
+            check = self.checkPorcentajeParidad(listaHombres, listaMujeres)
+
+            if not check:
+                out = {'message' : 'No se cumplen los ratios de paridad 60%-40%'}
+                break
+
+            # Recorremos todos los escanios disponibles      
+            while escanios > 0:
+                # Si existe paridad en ese momento
+                if paridad:
+                    # Si la cantidad de mujeres incluidas es menor que la cantidad de mujeres
+                    if m < len(listaMujeres):
+                        i['paridad'].append(listaMujeres[m])
+                        m = m + 1
+                    # Si no, se aniade un hombre y se pone la paridad a False
+                    else:
+                        i['paridad'].append(listaHombres[h])
+                        h = h + 1
+                    paridad = False
+               
+                # Si no existe paridad en ese momento   
+                else:
+                    # Si el numero de hombres es menor que el numero de hombres en la lista, se aniade un hombre
+                    if h < len(listaHombres):
+                        i['paridad'].append(listaHombres[h])
+                        h = h + 1
+                    # En caso contrario, se aniade una mujer y vuelve a existir paridad en la lista
+                    else:
+                        i['paridad'].append(listaMujeres[m])
+                        m = m + 1  
+                    paridad = True
+                    
+                # Cuenta regresiva de los escanios    
+                escanios -= 1
+        return out
+
+
+    def checkPorcentajeParidad(self, hombres, mujeres):
+        """
+            * Definicion: Comprueba si se cumplen los porcentajes minimos de hombres y mujeres
+            * Entrada: Lista de hombres y de mujeres en la votacion
+            * Salida: True si se cumple la paridad, False si no se cumple
+        """
+        total = len(hombres)+len(mujeres)
+       
+        porcentajeHombres = len(hombres)/total
+        porcentajeMujeres = len(mujeres)/total
+
+        return not (porcentajeMujeres < 0.4 or porcentajeHombres < 0.4)
+
+
+    def post(self, request):
+        """
+            * type: IDENTITY | PARIDAD | ORDER
+            * options: [
+                {
+                 option: str,
+                 number: int,
+                 votes: int,
+                 ...extraparams
+                }
+               ]
         """
 
         typeOfData = request.data.get('type', 'IDENTITY')
         options = request.data.get('options', [])
+        s = request.data.get('seats')
 
-        if typeOfData == 'IDENTITY':
+        elif typeOfData == 'IDENTITY':
             return self.identity(options)
         
-        if typeOfData == 'BORDA':
+        elif typeOfData == 'BORDA':
             return self.borda(options)
 
-
-        if typeOfData == 'SAINTE':
+        elif typeOfData == 'SAINTE':
             return Response(self.sainteLague(opts, s))    
 
         elif typeOfData == 'PARIDAD':
-
-        if typeOfData == 'PARIDAD':
-
-            check = self.check_json(options)
-            if check:
-                return Response(self.paridad(options))
-            else:
-                return Response({'message' : 'No se cumplen los ratios de paridad 60%-40%'})
+            return Response(self.paridad(options))
         
-        if typeOfData == 'ORDER':
+        elif typeOfData == 'ORDER':
             return Response(self.order(options))
-
+          
         return Response({})
