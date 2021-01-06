@@ -27,7 +27,7 @@ class PostProcTestCase(APITestCase):
                 { 'option': 'Option 6', 'number': 6, 'votes': 1 },
             ]
         }
-
+        
         expected_result = [
             { 'option': 'Option 1', 'number': 1, 'votes': 5, 'postproc': 5 },
             { 'option': 'Option 5', 'number': 5, 'votes': 5, 'postproc': 5 },
