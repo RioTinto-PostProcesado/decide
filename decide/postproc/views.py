@@ -73,7 +73,9 @@ class PostProcView(APIView):
 
       
     def sainteLague(self, options, seats):
-    """
+
+        
+        """
     
         * options: [
             {
@@ -90,14 +92,7 @@ class PostProcView(APIView):
         * Entrada: votos totales por cada eleccion y el numero de asientos o escaños
 
         * Salida: lista con los partidos y los asientos asignados
-    """
-
-    def paridad(self, options):
-        """
-            * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
-            * Entrada: Json de la votacion
-            * Salida: Lista de candidatos ordenada si hay paridad, mensaje de error si no hay paridad
-        """
+         """
 
         out = []
 
