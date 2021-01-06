@@ -244,7 +244,7 @@ class PostProcView(APIView):
             return self.borda(options)
 
         elif typeOfData == 'SAINTE':
-            return Response(self.sainteLague(opts, s))    
+            return Response(self.sainteLague(options, s))    
 
         elif typeOfData == 'PARIDAD':
             return Response(self.paridad(options))
