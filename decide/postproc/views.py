@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+import math
 
 
 class PostProcView(APIView):
@@ -16,6 +17,29 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
     
+
+    def order(self, options):
+        out = []
+
+        for opt in options:
+            out.append({
+                **opt,
+                'postproc': 0,
+            });
+
+        out.sort(key=lambda x: -x['votes'])
+
+        max=len(options)*1000
+
+        a=0
+
+        while a < len(out):
+            postproc_a=max-out[a]['votes']
+            out[a]['postproc']=postproc_a
+            a=a+1
+
+        return out
+
     def borda(self, options):
 
         #Añadimos total para todas las opciones
@@ -47,9 +71,10 @@ class PostProcView(APIView):
         res.sort(key=lambda x : x['total'],reverse=True)
         return Response(res)
 
+
     def post(self, request):
         """
-         * type: IDENTITY | EQUALITY | WEIGHT
+         * type: IDENTITY | PARIDAD | ORDER
          * options: [
             {
              option: str,
@@ -69,11 +94,14 @@ class PostProcView(APIView):
         if typeOfData == 'BORDA':
             return self.borda(options)
 
-        elif typeOfData == 'PARIDAD':
+        if typeOfData == 'PARIDAD':
             check = self.check_json(options)
             if check:
                 return Response(self.paridad(options))
             else:
                 return Response({'message' : 'No se cumplen los ratios de paridad 60%-40%'})
+        
+        if typeOfData == 'ORDER':
+            return Response(self.order(options))
 
         return Response({})
