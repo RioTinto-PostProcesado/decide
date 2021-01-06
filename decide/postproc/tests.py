@@ -43,6 +43,7 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+
     def test_SainteLague1(self):
         data = {
             'type': 'SAINTE',
@@ -71,10 +72,9 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+        
 
-
-
-        def test_SainteLague2(self):
+    def test_SainteLague2(self):
         data = {
             'type': 'SAINTE',
             'seats': 12,
@@ -102,4 +102,30 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-    
+
+
+    def test_dhondt(self):
+        data = {
+            "type": "DHONDT",
+            "escanio": "8",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 5 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 3 },
+                { "option": "Option 4", "number": 4, "votes": 2 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+                { "option": "Option 6", "number": 6, "votes": 1 },
+            ]
+        }
+        data = {
+            "type": "DHONDT",
+            "escanio": "10",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 20 },
+                { "option": "Option 2", "number": 2, "votes": 11 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 10 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+            ]
+        }
+
