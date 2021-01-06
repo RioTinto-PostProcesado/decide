@@ -43,7 +43,7 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
         
-  def testNoParidad(self):
+    def testNoParidad(self):
         """
             * Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
             * Entrada: Votacion
@@ -169,7 +169,7 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
     
     
-     def testParidad1Elemento(self):
+    def testParidad1Elemento(self):
         """
             * Definicion: Test positivo con solo un candidato de todos los posibles
             * Entrada: Votacion (Json)
