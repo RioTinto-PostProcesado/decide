@@ -73,8 +73,7 @@ class PostProcView(APIView):
 
       
     def sainteLague(self, options, seats):
-    """
-    
+        """
         * options: [
             {
              option: str,
@@ -90,7 +89,8 @@ class PostProcView(APIView):
         * Entrada: votos totales por cada eleccion y el numero de asientos o escaños
 
         * Salida: lista con los partidos y los asientos asignados
-    """
+        """
+        
         out = []
 
         for opt in options:
