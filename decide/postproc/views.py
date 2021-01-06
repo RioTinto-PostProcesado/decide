@@ -19,18 +19,12 @@ class PostProcView(APIView):
     
     def dhondt(self, options, escanio):
         """
-        Sistema d'Hondt es un método para asignar escaños en las listas electorales. 
-        Se caracteriza por dividir sucesivamente los totales de los votos obtenidos por los distintos partidos
-        y asignándo los escaños a los promedios más altos.
-         *escanio:10 
-         * options: [
-            {
-             option: Option 1,
-             number: 1,
-             votes: 20,
-            }
-           ]
+            * Definicion: Asigna escaños en las listas electorales
+            * Entrada: Json de la votación asignando los escaños según corresponda
+            * Salida: Lista de la opciones ordenadas según el número de escaños que posean,
+            de mayor a menor
         """
+        
         #Para cada opcion se le añaden escaños
         for opt in options:
             opt['escanio'] = 0
@@ -45,6 +39,7 @@ class PostProcView(APIView):
         options.sort(key=lambda x: -x['escanio'])
         return Response(options)
 
+        
 
     def post(self, request):
         """
@@ -70,6 +65,6 @@ class PostProcView(APIView):
         elif typeOfData == 'DHONDT':
             escanio = int(float(request.data.get('escanio', int )))
             return self.dhondt(options, escanio)
-            
-            
+        
         return Response({})
+        
