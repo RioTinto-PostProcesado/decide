@@ -90,7 +90,7 @@ class PostProcView(APIView):
 
         * Salida: lista con los partidos y los asientos asignados
         """
-        
+
         out = []
 
         for opt in options:
@@ -237,7 +237,7 @@ class PostProcView(APIView):
         options = request.data.get('options', [])
         s = request.data.get('seats')
 
-        elif typeOfData == 'IDENTITY':
+        if typeOfData == 'IDENTITY':
             return self.identity(options)
         
         elif typeOfData == 'BORDA':
