@@ -91,14 +91,6 @@ class PostProcView(APIView):
 
         * Salida: lista con los partidos y los asientos asignados
     """
-
-    def paridad(self, options):
-        """
-            * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
-            * Entrada: Json de la votacion
-            * Salida: Lista de candidatos ordenada si hay paridad, mensaje de error si no hay paridad
-        """
-
         out = []
 
         for opt in options:
@@ -145,7 +137,7 @@ class PostProcView(APIView):
             
         return out    
 
-      
+
     def paridad(self, options):
         """
             * Definicion: Devuelve la lista de candidatos intercalando hombres y mujeres en el caso de que se cumpla la paridad
