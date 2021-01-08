@@ -27,7 +27,7 @@ class PostProcTestCase(APITestCase):
                 { 'option': 'Option 6', 'number': 6, 'votes': 1 },
             ]
         }
-
+        
         expected_result = [
             { 'option': 'Option 1', 'number': 1, 'votes': 5, 'postproc': 5 },
             { 'option': 'Option 5', 'number': 5, 'votes': 5, 'postproc': 5 },
@@ -57,6 +57,14 @@ class PostProcTestCase(APITestCase):
                 { "option": "Option 6", "number": 6, "votes": 1 },
             ]
         }
+        expected_result = [
+            { "option": "Option 1", "number": 1, "votes": 5, "escanio": 3 },
+            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 3 },
+            { "option": "Option 3", "number": 3, "votes": 3, "escanio": 1 },
+            { "option": "Option 4", "number": 4, "votes": 2, "escanio": 1 },
+            { "option": "Option 2", "number": 2, "votes": 0, "escanio": 0 },
+            { "option": "Option 6", "number": 6, "votes": 1, "escanio": 0 },
+        ]
         data = {
             "type": "DHONDT",
             "escanio": "10",
@@ -68,6 +76,19 @@ class PostProcTestCase(APITestCase):
                 { "option": "Option 5", "number": 5, "votes": 5 },
             ]
         }
+        expected_result = [
+            { "option": "Option 1", "number": 1, "votes": 20, "escanio": 5 },
+            { "option": "Option 2", "number": 2, "votes": 11, "escanio": 2 },
+            { "option": "Option 4", "number": 4, "votes": 10, "escanio": 2 },
+            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 1 },
+            { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
+        ]
+
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
 
 
     def test_borda(self):
@@ -80,7 +101,6 @@ class PostProcTestCase(APITestCase):
                 { "option": "Option 1", "number": 4, "votes": 8, "group":"g2" },
                 { "option": "Option 2", "number": 5, "votes": 3, "group":"g2" },
                 { "option": "Option 3", "number": 6, "votes": 2, "group":"g2" }
-                
             ]
         }
 
@@ -99,3 +119,45 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+    
+        
+    
+    def test_order(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen 
+            y por tanto son las menos preferidas
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: los datos de entrada junto con el postprocesado, apareciendo primero el partido mas votado, 
+            que es a su vez el menos favorito por tener menos postprocesado
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 5 },
+                {  'number': 3,'option': 'Option 3', 'votes': 1 },
+                
+
+                
+            ]
+        }
+        expected_result = [            
+            
+            
+           
+            { 'number': 2,'option': 'Option 2', 'votes': 5,  'postproc': 2995 },
+            { 'number': 1,'option': 'Option 1', 'votes': 2,  'postproc': 2998 },
+            { 'number': 3,'option': 'Option 3', 'votes': 1, 'postproc': 2999 },
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+
