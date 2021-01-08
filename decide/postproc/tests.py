@@ -70,7 +70,7 @@ class PostProcTestCase(APITestCase):
         }
 
 
-def test_borda(self):
+    def test_borda(self):
         data = {
             "type": "BORDA",	
             "options": [
