@@ -18,7 +18,6 @@ class PostProcView(APIView):
         return Response(out)
 
     def order(self, options):
-
         """
             * options: [
                 {
@@ -115,6 +114,12 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['votes'])
 
         asientos = seats
+
+        if(asientos <= 0):
+
+            out = {'message': 'Los escaños son insuficientes'}
+
+            return out
 
         while asientos > 0:
 
