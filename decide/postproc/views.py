@@ -12,11 +12,10 @@ class PostProcView(APIView):
             out.append({
                 **opt,
                 'postproc': opt['votes'],
-            });
+            })
 
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
-    
 
     def order(self, options):
         out = []
@@ -25,54 +24,61 @@ class PostProcView(APIView):
             out.append({
                 **opt,
                 'postproc': 0,
-            });
+            })
 
         out.sort(key=lambda x: -x['votes'])
 
-        max=len(options)*1000
+        max = len(options)*1000
 
-        a=0
+        a = 0
 
         while a < len(out):
-            postproc_a=max-out[a]['votes']
-            out[a]['postproc']=postproc_a
-            a=a+1
+            postproc_a = max-out[a]['votes']
+            out[a]['postproc'] = postproc_a
+            a = a+1
 
         return out
 
     def borda(self, options):
 
-        #Añadimos total para todas las opciones
+        # Añadimos total para todas las opciones
         for opt in options:
             opt['total'] = 0
 
-        #Agrupamos las opciones segun su grupo de votación
+        # Agrupamos las opciones segun su grupo de votación
         grp = self.groups(options)
         res = []
 
-        #Ordenamos las opciones según el número de votos 
+        # Ordenamos las opciones según el número de votos
         for g in grp:
-            lista = sorted(grp[g], key = lambda x:x["votes"])
+            lista = sorted(grp[g], key=lambda x: x["votes"])
             votosTotales = 0
 
-            #Obtenemos la suma todos los votos
+            # Obtenemos la suma todos los votos
             for lis in lista:
-                votosTotales +=  lis["votes"]
-            
+                votosTotales += lis["votes"]
+
             cont = 1
-            #Aplicamos el algoritmo de borda
+            # Aplicamos el algoritmo de borda
             for l in lista:
                 tot = votosTotales * cont
                 l['total'] = tot
                 res.append(l)
                 cont += 1
-        
-        #Ordenamos todos los votos según su valot total tras aplicar borda
-        res.sort(key=lambda x : x['total'],reverse=True)
+
+        # Ordenamos todos los votos según su valot total tras aplicar borda
+        res.sort(key=lambda x: x['total'], reverse=True)
         return Response(res)
 
-      
     def sainteLague(self, options, seats):
+        """
+            * Definicion: Dado un numero de partido con sus votos correspondientes, devuelve los escaños
+            o asientos asignados a cada uno utilizando el algoritmo de SainteLague.
+
+            * Entrada: Json de la votacion, y asientos a dividir.
+
+            * Salida: Asientos divididos entre los partidos según sus votos.
+        """
 
         out = []
 
@@ -98,7 +104,7 @@ class PostProcView(APIView):
 
             while i < len(out):
 
-                #Calcula los escaños de los partidos selecionados
+                # Calcula los escaños de los partidos selecionados
 
                 primerValor = out[actual]['votes'] / \
                     (out[actual]['postproc'] + odd)
@@ -107,7 +113,7 @@ class PostProcView(APIView):
 
                 if (primerValor >= segundoValor):
 
-                    #Compara el valor de los partidos selecionados
+                    # Compara el valor de los partidos selecionados
 
                     i = i + 1
 
@@ -115,7 +121,7 @@ class PostProcView(APIView):
 
                 else:
 
-                    #Pasa a comparar a los siguientes partidos
+                    # Pasa a comparar a los siguientes partidos
 
                     actual = i
 
@@ -123,12 +129,12 @@ class PostProcView(APIView):
 
                     odd = odd+2
 
-            out[actual]['postproc'] = out[actual]['postproc'] + 1  #Asigna un escaño al partido correspondiente
+            out[actual]['postproc'] = out[actual]['postproc'] + \
+                1  # Asigna un escaño al partido correspondiente
 
-            asientos  = asientos - 1      #Descuenta un asiento a los totales
+            asientos = asientos - 1  # Descuenta un asiento a los totales
 
         return out
-
 
     def paridad(self, options):
         """
@@ -144,14 +150,14 @@ class PostProcView(APIView):
                 **opt,
                 'paridad': [],
             })
-                    
+
         for i in out:
             escanios = i['postproc']
             candidatos = i['candidatos']
             listaHombres = []
             listaMujeres = []
-            h=0
-            m=0
+            h = 0
+            m = 0
             paridad = True
 
             # Almacenamos en dos listas los hombres y las mujeres
@@ -164,10 +170,10 @@ class PostProcView(APIView):
             check = self.checkPorcentajeParidad(listaHombres, listaMujeres)
 
             if not check:
-                out = {'message' : 'No se cumplen los ratios de paridad 60%-40%'}
+                out = {'message': 'No se cumplen los ratios de paridad 60%-40%'}
                 break
 
-            # Recorremos todos los escanios disponibles      
+            # Recorremos todos los escanios disponibles
             while escanios > 0:
                 # Si existe paridad en ese momento
                 if paridad:
@@ -180,8 +186,8 @@ class PostProcView(APIView):
                         i['paridad'].append(listaHombres[h])
                         h = h + 1
                     paridad = False
-               
-                # Si no existe paridad en ese momento   
+
+                # Si no existe paridad en ese momento
                 else:
                     # Si el numero de hombres es menor que el numero de hombres en la lista, se aniade un hombre
                     if h < len(listaHombres):
@@ -190,13 +196,12 @@ class PostProcView(APIView):
                     # En caso contrario, se aniade una mujer y vuelve a existir paridad en la lista
                     else:
                         i['paridad'].append(listaMujeres[m])
-                        m = m + 1  
+                        m = m + 1
                     paridad = True
-                    
-                # Cuenta regresiva de los escanios    
+
+                # Cuenta regresiva de los escanios
                 escanios -= 1
         return out
-
 
     def checkPorcentajeParidad(self, hombres, mujeres):
         """
@@ -205,12 +210,11 @@ class PostProcView(APIView):
             * Salida: True si se cumple la paridad, False si no se cumple
         """
         total = len(hombres)+len(mujeres)
-       
+
         porcentajeHombres = len(hombres)/total
         porcentajeMujeres = len(mujeres)/total
 
         return not (porcentajeMujeres < 0.4 or porcentajeHombres < 0.4)
-
 
     def post(self, request):
         """
@@ -231,17 +235,17 @@ class PostProcView(APIView):
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
-        
+
         elif typeOfData == 'BORDA':
             return self.borda(options)
 
         elif typeOfData == 'SAINTE':
-            return Response(self.sainteLague(options, s))    
+            return Response(self.sainteLague(options, s))
 
         elif typeOfData == 'PARIDAD':
             return Response(self.paridad(options))
-        
+
         elif typeOfData == 'ORDER':
             return Response(self.order(options))
-          
+
         return Response({})
