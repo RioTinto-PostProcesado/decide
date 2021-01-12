@@ -1,4 +1,4 @@
-from python:alpine
+from python:3.7-alpine
 
 RUN apk add --no-cache git postgresql-dev gcc libc-dev
 RUN apk add --no-cache gcc g++ make libffi-dev python3-dev build-base
@@ -10,8 +10,8 @@ RUN pip install ipython
 
 WORKDIR /app
 
-RUN git clone https://github.com/wadobo/decide.git .
-RUN pip install -r requirements.txt
+RUN git clone https://github.com/RioTinto-PostProcesado/decide.git .
+RUN pip install -r requirementsDocker.txt
 
 WORKDIR /app/decide
 
