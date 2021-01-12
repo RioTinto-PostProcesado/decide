@@ -13,6 +13,18 @@ class Question(models.Model):
     def __str__(self):
         return self.desc
 
+#Añadida clase YesOrNo
+
+class YesOrNoQuestion(models.Model):
+    desc = models.TextField()
+    CHOICES = (
+        ('Y', 'Yes'),
+        ('N', 'No'),
+    )
+    choice = models.CharField(max_length=1, choices=CHOICES, blank=True)
+
+    def __str__(self):
+        return self.desc
 
 class QuestionOption(models.Model):
     question = models.ForeignKey(Question, related_name='options', on_delete=models.CASCADE)
@@ -26,7 +38,6 @@ class QuestionOption(models.Model):
 
     def __str__(self):
         return '{} ({})'.format(self.option, self.number)
-
 
 class Voting(models.Model):
     name = models.CharField(max_length=200)
@@ -121,3 +132,4 @@ class Voting(models.Model):
 
     def __str__(self):
         return self.name
+
