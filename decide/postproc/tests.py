@@ -215,7 +215,7 @@ class PostProcTestCase(APITestCase):
 
     def testParidad2(self):
         """
-            * Definicion: Test positivo con solo un candidato de todos los posibles
+            * Definicion: Test positivo con 2 hombres y 3 mujeres
             * Entrada: Votacion (Json)
                 - Option: Nombre del partido
                 - Number: Id de la opcion
@@ -251,6 +251,54 @@ class PostProcTestCase(APITestCase):
                 ,{'sexo':'mujer','id':'4'}
                 ,{'sexo':'hombre','id':'3'}
                 ,{'sexo':'mujer','id':'5'}
+                ]}
+        ]
+        
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    
+    def testParidad3(self):
+        """
+            * Definicion: Test positivo con 3 hombres y 2 mujeres
+            * Entrada: Votacion (Json)
+                - Option: Nombre del partido
+                - Number: Id de la opcion
+                - Votes: Numero de votos de esa votacion
+                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
+                - Candidatos: Sexo e ID de los candidatos
+            * Salida: Codigo 200 y json de la paridad
+        """
+        data = {
+            'type': 'PARIDAD',
+            'options': [
+                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ],
+                'paridad': [
+                 {'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'5'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
                 ]}
         ]
         
