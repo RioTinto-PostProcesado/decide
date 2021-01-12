@@ -73,23 +73,6 @@ class PostProcView(APIView):
 
       
     def sainteLague(self, options, seats):
-        """
-        * options: [
-            {
-             option: str,
-             number: int,
-             votes: int,
-             ...extraparams
-            }
-
-        * Definición:   Metodo que devolverá el resultado de las votaciones ordenando los resultados
-        por escaños o asientos, pero usando como divisores los números impares, para una mayor representación
-        de partidos o canditatos con menos votos. 
-
-        * Entrada: votos totales por cada eleccion y el numero de asientos o escaños
-
-        * Salida: lista con los partidos y los asientos asignados
-        """
 
         out = []
 
@@ -103,39 +86,48 @@ class PostProcView(APIView):
 
         out.sort(key=lambda x: -x['votes'])
 
-        se = seats;       #Numero de escaños (asientos) totales
+        asientos = seats
 
-        while se > 0:
+        while asientos > 0:
 
-            i = 1;
+            actual = 0
 
-            odd= 1;      #Genera que los dividores sean siempre impares
+            i = 1
 
-            actual = 0;
+            odd = 1
 
             while i < len(out):
 
-                valor1 = out[actual]['votes'] / (out[actual]['postproc'] + odd);
+                #Calcula los escaños de los partidos selecionados
 
-                comparador = out[i]['votes'] / (out[i]['postproc'] + odd);
+                primerValor = out[actual]['votes'] / \
+                    (out[actual]['postproc'] + odd)
 
-                if (valor1 >= comparador):
+                segundoValor = out[i]['votes'] / (out[i]['postproc'] + odd)
 
-                    i = i + 1;
+                if (primerValor >= segundoValor):
 
-                    odd= odd + 2;
+                    #Compara el valor de los partidos selecionados
+
+                    i = i + 1
+
+                    odd = odd+2
 
                 else:
 
-                    actual = i;
+                    #Pasa a comparar a los siguientes partidos
 
-                    odd= odd + 2;
+                    actual = i
 
-                out[actual]['postproc'] = out[actual]['postproc'] + 1;  #Le concede un escaño a la opcion
+                    i = i + 1
 
-            se = se - 1;     #Va descontando escaños
-            
-        return out    
+                    odd = odd+2
+
+            out[actual]['postproc'] = out[actual]['postproc'] + 1  #Asigna un escaño al partido correspondiente
+
+            asientos  = asientos - 1      #Descuenta un asiento a los totales
+
+        return out
 
 
     def paridad(self, options):
