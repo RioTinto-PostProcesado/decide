@@ -43,8 +43,7 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def testNoParidad(self):
-        """
-        
+        """   
             * Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
             * Entrada: Votacion
                 - Option: Nombre del partido
