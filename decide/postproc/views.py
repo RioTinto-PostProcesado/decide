@@ -16,6 +16,29 @@ class PostProcView(APIView):
         out.sort(key=lambda x: -x['postproc'])
         return Response(out)
 
+        
+    def simple(self, options, seats):
+
+        out = []
+
+        for opt in options:
+
+            out.append({
+                **opt,
+                'postproc': 0,
+            })
+
+        out.sort(key=lambda x: -x['votes'])
+
+        numeroEscanyos = seats;
+        numeroVotos = 0;
+
+        for votes in out:
+            numeroVotos= numeroVotos + votes['votes'];
+
+        valor_escanyo = numeroVotos/numeroEscanyos;
+
+
     def sin_paridad(self, options):
 
         """
@@ -81,7 +104,7 @@ class PostProcView(APIView):
 
     def post(self, request):
         """
-         * type: IDENTITY | EQUALITY | WEIGHT
+         * type: IDENTITY | EQUALITY | WEIGHT | SIN_PARIDAD
          * options: [
             {
              option: str,
