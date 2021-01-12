@@ -19,6 +19,28 @@ class PostProcView(APIView):
     
 
     def order(self, options):
+
+        """
+            * options: [
+                {
+                 option: str,
+                 number: int,
+                 votes: int,
+                 ...extraparams
+                }
+
+            * Definición: Método que devolverá el resultado de las votaciones, asignando mayor valor de
+            postprocesado a aquellas opciones con las posiciones más altas en votación. La votación de orden
+            consistirá en ordenar las opciones sugeridas siguiendo un criterio determinado (por ejemplo,
+            preferencia).
+
+            * Entrada: votos totales por cada eleccion (es decir, la suma total de los puestos obtenidos por
+            cada opción en las votaciones, de forma que las opciones con menos votos serán las que obtuvieran
+            posiciones más altas).
+
+            * Salida: lista con las opciones y sus valores de postprocesado correspondientes.
+        """
+
         out = []
 
         for opt in options:
