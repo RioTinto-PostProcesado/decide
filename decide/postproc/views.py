@@ -38,6 +38,45 @@ class PostProcView(APIView):
 
         valor_escanyo = numeroVotos/numeroEscanyos;
 
+        x = 0;        
+        
+        while numeroEscanyos > 0:
+            
+            if x < len(out):
+                
+                escanyos = math.trunc(out[x]['votes']/valor_escanyo)
+
+                out[x]['postproc'] = escanyos;
+
+                numeroEscanyos = numeroEscanyos - escanyos ;
+                
+                x = x + 1
+           
+            else:
+
+                actual = 0;
+                i = 1;
+
+                while i < len(out):
+
+
+                    valor_Actual = out[actual]['votes']/valor_escanyo - out[actual]['postproc']
+                    valor_Comparado = out[i]['votes']/valor_escanyo - out[i]['postproc']
+
+                    if (valor_Actual >= valor_Comparado:
+
+                        i = i + 1;
+
+                    else:
+
+                        actual = i;
+                        i = i + 1;
+
+                out[actual]['postproc'] = out[actual]['postproc'] + 1;
+
+                numeroEscanyos = numeroEscanyos - 1;
+        
+        return out
 
     def sin_paridad(self, options):
 
