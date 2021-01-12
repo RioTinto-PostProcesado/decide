@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
+import math
 
 class PostProcView(APIView):
 
@@ -63,7 +63,7 @@ class PostProcView(APIView):
                     valor_Actual = out[actual]['votes']/valor_escanyo - out[actual]['postproc']
                     valor_Comparado = out[i]['votes']/valor_escanyo - out[i]['postproc']
 
-                    if (valor_Actual >= valor_Comparado:
+                    if (valor_Actual >= valor_Comparado):
 
                         i = i + 1;
 
@@ -143,7 +143,7 @@ class PostProcView(APIView):
 
     def post(self, request):
         """
-         * type: IDENTITY | EQUALITY | WEIGHT | SIN_PARIDAD
+         * type: IDENTITY | EQUALITY | WEIGHT | SIMPLE
          * options: [
             {
              option: str,
@@ -156,12 +156,17 @@ class PostProcView(APIView):
 
         typeOfData = request.data.get('type')
         options =  request.data.get('options', [])
+        s = request.data.get('seats')
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
-        elif typeOfData == 'SIN_PARIDAD':    
-            
+        elif typeOfData == 'SIMPLE':
+            return Response(self.simple(options, s))
+
+        elif typeOfData == 'SIMPLE_SIN_PARIDAD':    
+            options = []
+            options = self.simple(options, s)
             return Response(self.sin_paridad(options))
            
         return Response({})
