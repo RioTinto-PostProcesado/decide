@@ -119,8 +119,22 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-    
-        
+
+    def test_bordaWrongPath(self):
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1" },
+                { "option": "Option 1", "number": 1, "votes": 5, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g2" },
+                { "option": "Option 2", "number": 5, "votes": 3, "group":"g2" },
+                { "option": "Option 3", "number": 6, "votes": 2, "group":"g2" }  
+            ]
+        }
+
+        response = self.client.post("/postprocesado/", data, format="json")
+        self.assertEqual(response.status_code, 404)
     
     def test_order(self):
         """
