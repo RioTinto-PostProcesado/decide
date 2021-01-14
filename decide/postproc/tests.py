@@ -89,8 +89,6 @@ class PostProcTestCase(APITestCase):
             { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
         ]
    
-       
-
         response = self.client.post("/postproc/", data, format="json")
         self.assertEqual(response.status_code, 200)
 
@@ -188,5 +186,34 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
     
+    def test_order_noVotes(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos,en esta ocasion no hay votos 
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: los datos de entrada junto con el postprocesado, apareciendo primero el partido mas votado, que es a su vez el menos favorito por tener menos postprocesado
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 0 },
+                {  'number': 2,'option': 'Option 2', 'votes': 0 },
+                {  'number': 3,'option': 'Option 3', 'votes': 0 },
+                
+            ]
+        }
+
+        expected_result = {
+            'message': 'Los escaños son insuficientes'
+        }
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
         
    
