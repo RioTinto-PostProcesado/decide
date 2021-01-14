@@ -240,6 +240,12 @@ class PostProcView(APIView):
 
     def simple(self, options, seats):
 
+        """
+            * Definicion: Devuelve el número de escaños de una votación según los votos recibidos y los escaños a dividir
+            * Entrada: Json de la votacion y número de escaños disponibles
+            * Salida: Lista ordenada con los resultados de la votación según los escaños conseguidos
+        """
+
         out = []
 
         for opt in options:
@@ -311,15 +317,9 @@ class PostProcView(APIView):
     def sin_paridad(self, options):
 
         """
-        Metodo que devolverá el resultado de las votaciones sin tener en 
-        cuenta la paridad de las personas presentadas a la votación
-        * options: [
-            {
-             option: str,
-             number: int,
-             votes: int,
-             ...extraparams
-            }
+            * Definicion: Calcula los miembros electos
+            * Entrada: Json de la votacion procesada
+            * Salida: Lista de candidatos ordenada
         """
 
         out = []
