@@ -30,52 +30,61 @@ class PostProcView(APIView):
 
         out.sort(key=lambda x: -x['votes'])
 
-        numeroEscanyos = seats;
-        numeroVotos = 0;
+        numeroEscanyos = seats
+        numeroVotos = 0
 
         for votes in out:
-            numeroVotos= numeroVotos + votes['votes'];
+            numeroVotos= numeroVotos + votes['votes']
 
-        valor_escanyo = numeroVotos/numeroEscanyos;
+        # Valor del escaño es igual al número de votos entre el número de escaños
+        valor_escanyo = numeroVotos/numeroEscanyos
 
         x = 0;        
-        
+
+        #Mientras el número de escaños sea mayor a cero
         while numeroEscanyos > 0:
             
+            #Si contador es menor que la longitud de out que intuyo es la cantidad de partidos que se presentan
             if x < len(out):
                 
+                #Los escaños se sacan truncando los votos entre el valor del escaño 
                 escanyos = math.trunc(out[x]['votes']/valor_escanyo)
 
-                out[x]['postproc'] = escanyos;
+                #Voy asignando los escaños según el contador
+                out[x]['postproc'] = escanyos
 
-                numeroEscanyos = numeroEscanyos - escanyos ;
+                #Actualizo el número de escaños
+                numeroEscanyos = numeroEscanyos - escanyos 
                 
+                #Actualizo el contador
                 x = x + 1
            
             else:
 
-                actual = 0;
-                i = 1;
+                #Controlo el partido actual
+                actual = 0
+                i = 1
 
                 while i < len(out):
 
-
+                    #El valor actual es el valor de los votos del partido del valor actual del escaño menos los escaños actuales del partido 
                     valor_Actual = out[actual]['votes']/valor_escanyo - out[actual]['postproc']
                     valor_Comparado = out[i]['votes']/valor_escanyo - out[i]['postproc']
 
                     if (valor_Actual >= valor_Comparado):
 
-                        i = i + 1;
+                        i = i + 1
 
                     else:
 
-                        actual = i;
-                        i = i + 1;
+                        actual = i
+                        i = i + 1
 
-                out[actual]['postproc'] = out[actual]['postproc'] + 1;
 
-                numeroEscanyos = numeroEscanyos - 1;
-        
+                out[actual]['postproc'] = out[actual]['postproc'] + 1
+
+                numeroEscanyos = numeroEscanyos - 1
+
         return out
 
     def sin_paridad(self, options):
@@ -105,7 +114,7 @@ class PostProcView(APIView):
         for i in out:
 
             escanyos = i['postproc']
-            presentados = i['presentados']
+            presentados = i['candidatos']
             x = 0
 
             while escanyos > 0:
@@ -156,17 +165,18 @@ class PostProcView(APIView):
 
         typeOfData = request.data.get('type')
         options =  request.data.get('options', [])
-        s = request.data.get('seats')
+        seats = request.data.get('seats')
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
         elif typeOfData == 'SIMPLE':
-            return Response(self.simple(options, s))
+            return Response(self.simple(options, seats))
 
         elif typeOfData == 'SIMPLE_SIN_PARIDAD':    
-            options = []
-            options = self.simple(options, s)
-            return Response(self.sin_paridad(options))
+            simple_options = []
+            simple_options = self.simple(options, seats)
+            return Response(self.sin_paridad(simple_options))
            
         return Response({})
+
