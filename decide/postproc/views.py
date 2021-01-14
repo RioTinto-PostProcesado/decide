@@ -371,11 +371,11 @@ class PostProcView(APIView):
         elif typeOfData == 'SAINTE':
             return Response(self.sainteLague(options, s))
         elif typeOfData == 'SIMPLE':
-            return Response(self.simple(options, seats))
+            return Response(self.simple(options, s))
 
         elif typeOfData == 'SIMPLE_SIN_PARIDAD':    
             simple_options = []
-            simple_options = self.simple(options, seats)
+            simple_options = self.simple(options, s)
             return Response(self.sin_paridad(simple_options))
 
         elif typeOfData == 'PARIDAD':
