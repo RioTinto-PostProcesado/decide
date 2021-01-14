@@ -317,9 +317,9 @@ class PostProcView(APIView):
     def sin_paridad(self, options):
 
         """
-            * Definicion: Calcula los miembros electos 
+            * Definicion: Calcula los miembros electos
             * Entrada: Json de la votacion procesada
-            * Salida: Lista de candidatos ordenada 
+            * Salida: Lista de candidatos ordenada
         """
 
         out = []
