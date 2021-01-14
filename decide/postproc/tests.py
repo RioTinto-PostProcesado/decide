@@ -271,6 +271,12 @@ class PostProcTestCase(APITestCase):
         
     def test_simple(self):
 
+        """
+            * Definicion: Comprueba que el método simple devuelva los resultados esperados
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación
+        """
+
         data = {
             'type': 'SIMPLE',
             'seats':10,
@@ -304,6 +310,12 @@ class PostProcTestCase(APITestCase):
 
     def test_simple_sin_paridad(self):
         
+        """
+            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los candidatos electos
+        """
+
         data = {
             'type': 'SIMPLE_SIN_PARIDAD',
             'seats':10,
@@ -450,6 +462,12 @@ class PostProcTestCase(APITestCase):
 
     def testSimpleFalla(self):
         
+        """
+            * Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
+            * Entrada: Json de la votacion
+            * Salida: Codigo 404 
+        """
+
         data = {
             'type': 'SIMPLE',
             'seats':1,
