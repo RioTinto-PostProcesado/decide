@@ -275,7 +275,7 @@ class PostProcTestCase(APITestCase):
             'type': 'SIMPLE',
             'seats':10,
             'options': [
-                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }, #2.285
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 },
                 { 'option': 'Filemon', 'number': 2, 'votes': 2 },
                 { 'option': 'Bacterio', 'number': 3, 'votes': 4 },
                 { 'option': 'Ofelia', 'number': 4, 'votes': 3 },
@@ -286,12 +286,12 @@ class PostProcTestCase(APITestCase):
         }
 
         expected_result = [
-            { 'option': 'Mortadelo', 'number': 1, 'votes': 5, 'postproc': 3 },#0.188
-            { 'option': 'Super', 'number': 5, 'votes': 5, 'postproc': 3 },#0.188
-            { 'option': 'Bacterio', 'number': 3, 'votes': 4, 'postproc': 2 },#0.31
-            { 'option': 'Ofelia', 'number': 4, 'votes': 3, 'postproc': 1 },#0.14
+            { 'option': 'Mortadelo', 'number': 1, 'votes': 5, 'postproc': 3 },
+            { 'option': 'Super', 'number': 5, 'votes': 5, 'postproc': 3 },
+            { 'option': 'Bacterio', 'number': 3, 'votes': 4, 'postproc': 2 },
+            { 'option': 'Ofelia', 'number': 4, 'votes': 3, 'postproc': 1 },
             { 'option': 'Filemon', 'number': 2, 'votes': 2, 'postproc': 1 },
-            { 'option': 'Botones Sacarino', 'number': 6, 'votes': 1, 'postproc': 0 },#0.285
+            { 'option': 'Botones Sacarino', 'number': 6, 'votes': 1, 'postproc': 0 },
             
 
         ]
@@ -447,3 +447,17 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
+    def testSimpleFalla(self):
+        
+        data = {
+            'type': 'SIMPLE',
+            'seats':1,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }
+            ]
+        }
+
+    
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
