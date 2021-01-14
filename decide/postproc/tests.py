@@ -216,4 +216,26 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
         
+    def test_order_error(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen y por tanto son las menos preferidas
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Codigo 404
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 5 },
+                {  'number': 3,'option': 'Option 3', 'votes': 1 },
+                
+            ]
+        }
+
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
    
