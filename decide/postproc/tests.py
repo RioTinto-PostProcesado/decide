@@ -465,7 +465,7 @@ class PostProcTestCase(APITestCase):
         """
             *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
             *Entrada: Json de la votacion
-            *Salida: Codigo 404 
+            *Salida: Codigo 404
         """
 
         data = {
