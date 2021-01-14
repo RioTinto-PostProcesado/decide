@@ -463,9 +463,9 @@ class PostProcTestCase(APITestCase):
     def testSimpleFalla(self):
         
         """
-            * Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
-            * Entrada: Json de la votacion
-            * Salida: Codigo 404 
+            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
+            *Entrada: Json de la votacion
+            *Salida: Codigo 404 
         """
 
         data = {
