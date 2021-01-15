@@ -651,7 +651,6 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
-        self.maxDiff = None
         self.assertEqual(values, expected_result)
 
 
