@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 import math
 
 
@@ -402,6 +403,11 @@ class PostProcView(APIView):
             simple_options = []
             simple_options = self.simple(options, s)
             return Response(self.sin_paridad(simple_options))
+
+        elif typeOfData == 'SAINTE_LAGUE_SIN_PARIDAD':    
+            sL_options = []
+            sL_options = self.sainteLague(options, s)
+            return Response(self.sin_paridad(sL_options))
 
         elif typeOfData == 'PARIDAD':
             return Response(self.paridad(options))

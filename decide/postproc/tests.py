@@ -268,6 +268,206 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
+
+    def testParidad2(self):
+        """
+            * Definicion: Test positivo con 2 hombres y 3 mujeres
+            * Entrada: Votacion (Json)
+                - Option: Nombre del partido
+                - Number: Id de la opcion
+                - Votes: Numero de votos de esa votacion
+                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
+                - Candidatos: Sexo e ID de los candidatos
+            * Salida: Codigo 200 y json de la paridad
+        """
+        data = {
+            'type': 'PARIDAD',
+            'options': [
+                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ],
+                'paridad': [
+                 {'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
+        ]
+        
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    
+    def testParidad3(self):
+        """
+            * Definicion: Test positivo con 3 hombres y 2 mujeres
+            * Entrada: Votacion (Json)
+                - Option: Nombre del partido
+                - Number: Id de la opcion
+                - Votes: Numero de votos de esa votacion
+                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
+                - Candidatos: Sexo e ID de los candidatos
+            * Salida: Codigo 200 y json de la paridad
+        """
+        data = {
+            'type': 'PARIDAD',
+            'options': [
+                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ]}
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'mujer','id':'5'}
+                ],
+                'paridad': [
+                 {'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'5'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ]}
+        ]
+        
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+        
+    def test_SainteLague3(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
+        
+        data = {
+            'type': 'SAINTE',
+            'seats': 15,
+            'options': [
+                {'option': 'Partido 1', 'number': 1, 'votes': 50},
+                {'option': 'Partido 2', 'number': 2, 'votes': 10},
+                {'option': 'Partido 3', 'number': 3, 'votes': 5},
+                {'option': 'Partido 4', 'number': 4, 'votes': 25},
+                {'option': 'Partido 5', 'number': 5, 'votes': 56},
+                {'option': 'Partido 6', 'number': 6, 'votes': 120},
+                {'option': 'Partido 7', 'number': 7, 'votes': 45},
+            ]
+        }
+
+        expected_result = [
+            {'option': 'Partido 6', 'number': 6, 'votes': 120, 'postproc': 8},
+            {'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 3},
+            {'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 2},
+            {'option': 'Partido 7', 'number': 7, 'votes': 45, 'postproc': 2},
+            {'option': 'Partido 4', 'number': 4, 'votes': 25, 'postproc': 0},
+            {'option': 'Partido 2', 'number': 2, 'votes': 10, 'postproc': 0},
+            {'option': 'Partido 3', 'number': 3, 'votes': 5, 'postproc': 0},
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    def test_SainteLague4(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
+        data = {
+            'type': 'SAINTE',
+            'seats': 7,
+            'options': [
+                {'option': 'Partido 1', 'number': 1, 'votes': 50},
+                {'option': 'Partido 2', 'number': 2, 'votes': 10},
+                {'option': 'Partido 3', 'number': 3, 'votes': 5},
+                {'option': 'Partido 4', 'number': 4, 'votes': 25},
+                {'option': 'Partido 5', 'number': 5, 'votes': 56},
+                {'option': 'Partido 6', 'number': 6, 'votes': 120},
+                {'option': 'Partido 7', 'number': 7, 'votes': 45},
+            ]
+        }
+
+        expected_result = [
+            {'option': 'Partido 6', 'number': 6, 'votes': 120, 'postproc': 4},
+            {'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 2},
+            {'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 1},
+            {'option': 'Partido 7', 'number': 7, 'votes': 45, 'postproc': 0},
+            {'option': 'Partido 4', 'number': 4, 'votes': 25, 'postproc': 0},
+            {'option': 'Partido 2', 'number': 2, 'votes': 10, 'postproc': 0},
+            {'option': 'Partido 3', 'number': 3, 'votes': 5, 'postproc': 0},
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)  
+
+    def test_SainteLagueURL(self):
+
+        """
+            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
+            *Entrada: Json de la votacion
+            *Salida: Codigo 404
+        """
+        data = {
+            'type': 'SAINTE',
+            'seats': 7,
+            'options': [
+                {'option': 'Partido 1', 'number': 1, 'votes': 50},
+                {'option': 'Partido 2', 'number': 2, 'votes': 10},
+                {'option': 'Partido 3', 'number': 3, 'votes': 5},
+                {'option': 'Partido 4', 'number': 4, 'votes': 25},
+                {'option': 'Partido 5', 'number': 5, 'votes': 56},
+                {'option': 'Partido 6', 'number': 6, 'votes': 120},
+                {'option': 'Partido 7', 'number': 7, 'votes': 45},
+            ]
+        }
+
+        
+
+        response = self.client.post('/postproco/', data, format='json')
+
+        self.assertEqual(response.status_code, 404)
         
     def test_simple(self):
 
@@ -308,7 +508,133 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+    def test_simple_grande(self):
+        """
+            * Definicion: Comprueba que el método simple devuelva los resultados esperados 
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación
+        """
+        data = {
+            'type': 'SIMPLE',
+            'seats': 500,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 10000 },
+                { 'option': 'Filemon', 'number': 2, 'votes': 20000 },
+                { 'option': 'Bacterio', 'number': 3, 'votes': 500 },
+                { 'option': 'Ofelia', 'number': 4, 'votes':  400},
+                { 'option': 'Super', 'number': 5, 'votes': 15000 },
+                { 'option': 'Botones Sacarino', 'number': 6, 'votes': 4100 },
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Filemon', 'number': 2, 'votes': 20000, 'postproc': 200 },
+            { 'option': 'Super', 'number': 5, 'votes': 15000, 'postproc': 150 },
+            { 'option': 'Mortadelo', 'number': 1, 'votes': 10000, 'postproc':  100},
+            { 'option': 'Botones Sacarino', 'number': 6, 'votes': 4100, 'postproc': 41 },
+            { 'option': 'Bacterio', 'number': 3, 'votes': 500, 'postproc': 5 },
+            { 'option': 'Ofelia', 'number': 4, 'votes': 400, 'postproc': 4 },
+        ]
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    def testSimpleFalla(self):
+        
+        """
+            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
+            *Entrada: Json de la votacion
+            *Salida: Codigo 404
+        """
+
+        data = {
+            'type': 'SIMPLE',
+            'seats':1,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }
+            ]
+        }
+
+        
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
+
     def test_simple_sin_paridad(self):
+        
+        """
+            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos 
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los candidatos electos
+        """
+
+        data = {
+            'type': 'SIMPLE_SIN_PARIDAD',
+            'seats':5,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 50,'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}, 
+                { 'option': 'Filemon', 'number': 2, 'votes': 30,'candidatos': [
+                {'sexo':'mujer','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}
+            ]
+        }
+
+        expected_result = [
+
+            { 'option': 'Mortadelo', 'number': 1, 'votes': 50, 'postproc': 3, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [
+                {'sexo':'hombre','id':'1'},
+                {'sexo':'mujer','id':'2'},
+                {'sexo':'hombre','id':'3'}
+                ]
+            },
+              
+            { 'option': 'Filemon', 'number': 2, 'votes': 30, 'postproc': 2 , 'candidatos': [
+                 {'sexo':'mujer','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [
+                {'sexo':'mujer','id':'1'},
+                {'sexo':'hombre','id':'2'},
+                ]
+            }
+        ]
+        
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.maxDiff = None
+        self.assertEqual(values, expected_result)
+
+
+
+    def test_simple_sin_paridad_grande(self):
         
         """
             * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos
@@ -461,116 +787,163 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
 
-    def testSimpleFalla(self):
+    
+    def test_saint_lague_sin_paridad(self):
         
         """
-            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
-            *Entrada: Json de la votacion
-            *Salida: Codigo 404
+            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos con el algoritmo Saint Lague
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los candidatos electos
         """
 
         data = {
-            'type': 'SIMPLE',
-            'seats':1,
+            'type': 'SAINTE_LAGUE_SIN_PARIDAD',
+            'seats':12,
             'options': [
-                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }
-            ]
-        }
-
-    
-        response = self.client.post('/postproci/', data, format='json')
-        self.assertEqual(response.status_code, 404)
-
-
-    def testParidad2(self):
-        """
-            * Definicion: Test positivo con 2 hombres y 3 mujeres
-            * Entrada: Votacion (Json)
-                - Option: Nombre del partido
-                - Number: Id de la opcion
-                - Votes: Numero de votos de esa votacion
-                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
-                - Candidatos: Sexo e ID de los candidatos
-            * Salida: Codigo 200 y json de la paridad
-        """
-        data = {
-            'type': 'PARIDAD',
-            'options': [
-                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
+                { 'option': 'Partido 1', 'number': 1, 'votes': 50,'candidatos': [
                  {'sexo':'hombre','id':'1'}
-                ,{'sexo':'hombre','id':'3'}
                 ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
                 ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ]}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}, 
+                { 'option': 'Partido 2', 'number': 2, 'votes': 10,'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]},
+                {'option': 'Partido 3', 'number': 3, 'votes': 34, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}, 
+                { 'option': 'Partido 4', 'number': 4, 'votes': 25,'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ] },
+                { 'option': 'Partido 5', 'number': 5, 'votes': 56,'candidatos': [
+                {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]},
+                { 'option': 'Partido 6', 'number': 6, 'votes': 170,'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ,{'sexo':'hombre','id':'7'}
+                ,{'sexo':'mujer','id':'8'}
+                ,{'sexo':'hombre','id':'9'}
+                ,{'sexo':'mujer','id':'10'}
+                ,{'sexo':'hombre','id':'11'}
+                ,{'sexo':'mujer','id':'12'}
+                ]},
+        
             ]
         }
 
         expected_result = [
-            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
+
+            { 'option': 'Partido 6', 'number': 6, 'votes': 170, 'postproc': 9, 'candidatos': [
                  {'sexo':'hombre','id':'1'}
-                ,{'sexo':'hombre','id':'3'}
                 ,{'sexo':'mujer','id':'2'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ],
-                'paridad': [
-                 {'sexo':'mujer','id':'2'}
-                ,{'sexo':'hombre','id':'1'}
-                ,{'sexo':'mujer','id':'4'}
                 ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'5'}
-                ]}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ,{'sexo':'hombre','id':'7'}
+                ,{'sexo':'mujer','id':'8'}
+                ,{'sexo':'hombre','id':'9'}
+                ,{'sexo':'mujer','id':'10'}
+                ,{'sexo':'hombre','id':'11'}
+                ,{'sexo':'mujer','id':'12'}
+                ], 
+                'paridad': [
+                {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ,{'sexo':'hombre','id':'7'}
+                ,{'sexo':'mujer','id':'8'}
+                ,{'sexo':'hombre','id':'9'}
+                ]
+            },
+              
+            {'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 2, 'candidatos': [
+                {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [
+                {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ]
+            },
+            { 'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 1, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [{'sexo':'hombre','id':'1'}]
+            },
+            { 'option': 'Partido 3', 'number': 3, 'votes': 34, 'postproc': 0 , 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': []
+            },
+            { 'option': 'Partido 4', 'number': 4, 'votes': 25, 'postproc': 0, 'candidatos': [
+                {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': []
+                },
+            { 'option': 'Partido 2', 'number': 2, 'votes': 10, 'postproc': 0 , 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': []
+            }
+            
         ]
         
-        response = self.client.post('/postproc/', data, format='json')
-        self.assertEqual(response.status_code, 200)
 
-        values = response.json()
-        self.assertEqual(values, expected_result)
-
-    
-    def testParidad3(self):
-        """
-            * Definicion: Test positivo con 3 hombres y 2 mujeres
-            * Entrada: Votacion (Json)
-                - Option: Nombre del partido
-                - Number: Id de la opcion
-                - Votes: Numero de votos de esa votacion
-                - PostProc: Numero de personas que van a ir en la lista una vez aplicada la paridad
-                - Candidatos: Sexo e ID de los candidatos
-            * Salida: Codigo 200 y json de la paridad
-        """
-        data = {
-            'type': 'PARIDAD',
-            'options': [
-                { 'option': 'Partido Unico', 'number': 1, 'votes': 5 , 'postproc': 5, 'candidatos': [
-                 {'sexo':'hombre','id':'1'}
-                ,{'sexo':'hombre','id':'2'}
-                ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ]}
-            ]
-        }
-
-        expected_result = [
-            { 'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
-                 {'sexo':'hombre','id':'1'}
-                ,{'sexo':'hombre','id':'2'}
-                ,{'sexo':'hombre','id':'3'}
-                ,{'sexo':'mujer','id':'4'}
-                ,{'sexo':'mujer','id':'5'}
-                ],
-                'paridad': [
-                 {'sexo':'mujer','id':'4'}
-                ,{'sexo':'hombre','id':'1'}
-                ,{'sexo':'mujer','id':'5'}
-                ,{'sexo':'hombre','id':'2'}
-                ,{'sexo':'hombre','id':'3'}
-                ]}
-        ]
-        
         response = self.client.post('/postproc/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
