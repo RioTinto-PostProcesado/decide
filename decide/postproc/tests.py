@@ -135,7 +135,7 @@ class PostProcTestCase(APITestCase):
                 - Option: nombre de la opcion
                 - Votes: Numero de votos que recibe en la votación
             * Salida: Codigo 404
-        """ 
+        """
 
         data = {
             "type": "DHONDT",
@@ -172,7 +172,7 @@ class PostProcTestCase(APITestCase):
             ]
         }
 
-        expected_result = [           
+        expected_result = [
             { 'number': 2,'option': 'Option 2', 'votes': 5,  'postproc': 2995 },
             { 'number': 1,'option': 'Option 1', 'votes': 2,  'postproc': 2998 },
             { 'number': 3,'option': 'Option 3', 'votes': 1, 'postproc': 2999 },
