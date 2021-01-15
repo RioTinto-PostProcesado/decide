@@ -42,7 +42,6 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-
     
     def test_dhondt(self):
         
@@ -103,7 +102,7 @@ class PostProcTestCase(APITestCase):
                 - Option: nombre de la opcion
                 - Votes: Numero de votos que recibe en la votación
             * Salida: Codigo 200 con mensaje de que no hay escaños suficientes para repartir
-        """ 
+        """
 
         data = {
             "type": "DHONDT",
@@ -173,8 +172,7 @@ class PostProcTestCase(APITestCase):
             ]
         }
 
-        expected_result = [            
-           
+        expected_result = [           
             { 'number': 2,'option': 'Option 2', 'votes': 5,  'postproc': 2995 },
             { 'number': 1,'option': 'Option 1', 'votes': 2,  'postproc': 2998 },
             { 'number': 3,'option': 'Option 3', 'votes': 1, 'postproc': 2999 },
@@ -188,7 +186,7 @@ class PostProcTestCase(APITestCase):
     
     def test_order_noVotes(self):
         """
-            * Definicion: Test para mostrar que aquellas opciones con más votos,en esta ocasion no hay votos 
+            * Definicion: Test para mostrar que aquellas opciones con más votos,en esta ocasion no hay votos
             * Entrada: Votacion
                 - Number: id del partido
                 - Option: nombre de la opcion
