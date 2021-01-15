@@ -577,7 +577,7 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
         
-   def test_SainteLague3(self):
+    def test_SainteLague3(self):
 
         """
             * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
