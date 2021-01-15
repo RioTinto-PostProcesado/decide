@@ -410,8 +410,7 @@ class PostProcView(APIView):
             return Response(self.order(options))
 
         elif typeOfData == 'DHONDT':
-            escanio = int(float(request.data.get('escanio', int )))
-            return self.dhondt(options, escanio)
+            return self.dhondt(options, s)
         
         return Response({})
         
