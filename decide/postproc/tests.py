@@ -185,7 +185,13 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def test_SainteLague1(self):
-        
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
         data = {
             'type': 'SAINTE',
             'seats': 12,
@@ -215,6 +221,13 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def test_SainteLague2(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
         data = {
             'type': 'SAINTE',
             'seats': 15,
@@ -246,6 +259,13 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def test_SainteLagueMal(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague falla si hay 0 asientos o menos
+            * Entrada: Json de la votacion
+            * Salida: mensaje de error
+        """
+
         data = {
             'type': 'SAINTE',
             'seats': 0,
@@ -482,6 +502,14 @@ class PostProcTestCase(APITestCase):
 
 
     def test_SainteLague3(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
+        
         data = {
             'type': 'SAINTE',
             'seats': 15,
@@ -513,6 +541,13 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def test_SainteLague4(self):
+
+        """
+            * Definicion: Comprueba que el método SainteLague devuelve los asientos correctos
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los asientos correctos
+        """
+
         data = {
             'type': 'SAINTE',
             'seats': 7,
