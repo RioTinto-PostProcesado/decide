@@ -308,7 +308,133 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+    def test_simple_grande(self):
+        """
+            * Definicion: Comprueba que el método simple devuelva los resultados esperados 
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación
+        """
+        data = {
+            'type': 'SIMPLE',
+            'seats': 500,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 10000 },
+                { 'option': 'Filemon', 'number': 2, 'votes': 20000 },
+                { 'option': 'Bacterio', 'number': 3, 'votes': 500 },
+                { 'option': 'Ofelia', 'number': 4, 'votes':  400},
+                { 'option': 'Super', 'number': 5, 'votes': 15000 },
+                { 'option': 'Botones Sacarino', 'number': 6, 'votes': 4100 },
+            ]
+        }
+
+        expected_result = [
+            { 'option': 'Filemon', 'number': 2, 'votes': 20000, 'postproc': 200 },
+            { 'option': 'Super', 'number': 5, 'votes': 15000, 'postproc': 150 },
+            { 'option': 'Mortadelo', 'number': 1, 'votes': 10000, 'postproc':  100},
+            { 'option': 'Botones Sacarino', 'number': 6, 'votes': 4100, 'postproc': 41 },
+            { 'option': 'Bacterio', 'number': 3, 'votes': 500, 'postproc': 5 },
+            { 'option': 'Ofelia', 'number': 4, 'votes': 400, 'postproc': 4 },
+        ]
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    def testSimpleFalla(self):
+        
+        """
+            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
+            *Entrada: Json de la votacion
+            *Salida: Codigo 404
+        """
+
+        data = {
+            'type': 'SIMPLE',
+            'seats':1,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }
+            ]
+        }
+
+        
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
+
     def test_simple_sin_paridad(self):
+        
+        """
+            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos 
+            * Entrada: Json de la votacion
+            * Salida: Codigo 200 y Json con el resultado de la votación y los candidatos electos
+        """
+
+        data = {
+            'type': 'SIMPLE_SIN_PARIDAD',
+            'seats':5,
+            'options': [
+                { 'option': 'Mortadelo', 'number': 1, 'votes': 50,'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}, 
+                { 'option': 'Filemon', 'number': 2, 'votes': 30,'candidatos': [
+                {'sexo':'mujer','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ]}
+            ]
+        }
+
+        expected_result = [
+
+            { 'option': 'Mortadelo', 'number': 1, 'votes': 50, 'postproc': 3, 'candidatos': [
+                 {'sexo':'hombre','id':'1'}
+                ,{'sexo':'mujer','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [
+                {'sexo':'hombre','id':'1'},
+                {'sexo':'mujer','id':'2'},
+                {'sexo':'hombre','id':'3'}
+                ]
+            },
+              
+            { 'option': 'Filemon', 'number': 2, 'votes': 30, 'postproc': 2 , 'candidatos': [
+                 {'sexo':'mujer','id':'1'}
+                ,{'sexo':'hombre','id':'2'}
+                ,{'sexo':'hombre','id':'3'}
+                ,{'sexo':'mujer','id':'4'}
+                ,{'sexo':'hombre','id':'5'}
+                ,{'sexo':'mujer','id':'6'}
+                ], 
+                'paridad': [
+                {'sexo':'mujer','id':'1'},
+                {'sexo':'hombre','id':'2'},
+                ]
+            }
+        ]
+        
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.maxDiff = None
+        self.assertEqual(values, expected_result)
+
+
+
+    def test_simple_sin_paridad_grande(self):
         
         """
             * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos
@@ -465,7 +591,7 @@ class PostProcTestCase(APITestCase):
     def test_saint_lague_sin_paridad(self):
         
         """
-            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos
+            * Definicion: Comprueba que el método sin_paridad devuelve los candidatos electos correctos con el algoritmo Saint Lague
             * Entrada: Json de la votacion
             * Salida: Codigo 200 y Json con el resultado de la votación y los candidatos electos
         """
@@ -626,23 +752,4 @@ class PostProcTestCase(APITestCase):
 
 
 
-    def testSimpleFalla(self):
-        
-        """
-            *Definicion: Comprueba que si no se accede correctamente a la url el método devuelve un 404
-            *Entrada: Json de la votacion
-            *Salida: Codigo 404
-        """
-
-        data = {
-            'type': 'SIMPLE',
-            'seats':1,
-            'options': [
-                { 'option': 'Mortadelo', 'number': 1, 'votes': 5 }
-            ]
-        }
-
-        
-        response = self.client.post('/postproci/', data, format='json')
-        self.assertEqual(response.status_code, 404)
-
+    
