@@ -27,7 +27,7 @@ class PostProcTestCase(APITestCase):
                 {'option': 'Option 6', 'number': 6, 'votes': 1},
             ]
         }
-        
+
         expected_result = [
             {'option': 'Option 1', 'number': 1, 'votes': 5, 'postproc': 5},
             {'option': 'Option 5', 'number': 5, 'votes': 5, 'postproc': 5},
@@ -668,44 +668,7 @@ class PostProcTestCase(APITestCase):
                 
             ]
 
-        response = self.client.post("/postproc/", data, format="json")
-        self.assertEqual(response.status_code, 200)
 
-        values = response.json()
-        self.assertEqual(values, expected_result)
-
-    
-    def test_order(self):
-        """
-            * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen 
-            y por tanto son las menos preferidas
-            * Entrada: Votacion
-                - Number: id del partido
-                - Option: nombre de la opcion
-                - Votes: Numero de votos que recibe en la votación
-            * Salida: los datos de entrada junto con el postprocesado, apareciendo primero el partido mas votado, 
-            que es a su vez el menos favorito por tener menos postprocesado
-        """        
-
-        data = {
-            'type': 'ORDER',
-            'options': [
-                {  'number': 1,'option': 'Option 1', 'votes': 2 },
-                {  'number': 2,'option': 'Option 2', 'votes': 5 },
-                {  'number': 3,'option': 'Option 3', 'votes': 1 },
-                
-
-                
-            ]
-        }
-        expected_result = [            
-            
-            
-           
-            { 'number': 2,'option': 'Option 2', 'votes': 5,  'postproc': 2995 },
-            { 'number': 1,'option': 'Option 1', 'votes': 2,  'postproc': 2998 },
-            { 'number': 3,'option': 'Option 3', 'votes': 1, 'postproc': 2999 },
-        ]
         response = self.client.post('/postproc/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
@@ -719,7 +682,6 @@ class PostProcTestCase(APITestCase):
             * Entrada: Json de la votacion
             * Salida: Codigo 200 y Json con el resultado de la votación
         """
-
         data = {
             'type': 'SIMPLE',
             'seats':10,
@@ -1022,19 +984,12 @@ class PostProcTestCase(APITestCase):
                 'paridad': [
                 ]
             }
-            
         ]
-        
-
-
         response = self.client.post('/postproc/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
         self.assertEqual(values, expected_result)
-
-
-
     
     def test_saint_lague_sin_paridad(self):
         
@@ -1197,3 +1152,267 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
+
+
+    def test_dhondt(self):
+        
+        data = {
+            "type": "DHONDT",
+            "escanio": "8",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 5 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 3 },
+                { "option": "Option 4", "number": 4, "votes": 2 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+                { "option": "Option 6", "number": 6, "votes": 1 },
+            ]
+        }
+        
+        expected_result = [
+            { "option": "Option 1", "number": 1, "votes": 5, "escanio": 3 },
+            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 3 },
+            { "option": "Option 3", "number": 3, "votes": 3, "escanio": 1 },
+            { "option": "Option 4", "number": 4, "votes": 2, "escanio": 1 },
+            { "option": "Option 2", "number": 2, "votes": 0, "escanio": 0 },
+            { "option": "Option 6", "number": 6, "votes": 1, "escanio": 0 },
+        ]
+
+
+        data = {
+            "type": "DHONDT",
+            "escanio": 10,
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 20 },
+                { "option": "Option 2", "number": 2, "votes": 11 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 10 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
+            ]
+        }
+        
+        expected_result = [
+            { "option": "Option 1", "number": 1, "votes": 20, "escanio": 5 },
+            { "option": "Option 2", "number": 2, "votes": 11, "escanio": 2 },
+            { "option": "Option 4", "number": 4, "votes": 10, "escanio": 2 },
+            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 1 },
+            { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
+        ]
+   
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)  
+
+    def test_dhondt_error(self):
+        """
+            * Definicion: Test negativo que no recibe escaños
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Codigo 200 con mensaje de que no hay escaños suficientes para repartir
+        """
+
+        data = {
+            "type": "DHONDT",
+            "escanio": 0,
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 10 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 1 },
+                { "option": "Option 5", "number": 5, "votes": 4 },
+                { "option": "Option 6", "number": 6, "votes": 2 },
+            ]
+        }
+        
+        expected_result = {
+            'message': 'Los escaños son insuficientes'
+        }
+        
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result) 
+
+    def test_dhondt_mal(self):
+        """
+            * Definicion: Test negativo que no recibe escaños
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Codigo 404
+        """
+
+        data = {
+            "type": "DHONDT",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 10 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 1 },
+                { "option": "Option 5", "number": 5, "votes": 4 },
+                { "option": "Option 6", "number": 6, "votes": 2 },
+            ]
+        }
+        
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
+    
+    def test_dhondt_noVotes(self):
+        """
+            * Definición: Test negativo que no recibe votos
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opción
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Código 200 con los datos de entrada junto con el postprocesado, de forma
+            que ningún partido recibe escaños
+        """
+
+        data = {
+            "type": "DHONDT",
+            "escanio": "8",
+            "options": [
+                { "option": "Option 1", "number": 1, "votes": 0 },
+                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 3", "number": 3, "votes": 0 },
+                { "option": "Option 4", "number": 4, "votes": 0 },
+                { "option": "Option 5", "number": 5, "votes": 0 },
+                { "option": "Option 6", "number": 6, "votes": 0 },
+            ]
+        }
+        
+        expected_result = {
+            'message': 'No hay votos'
+        }
+   
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    def test_order(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen y por tanto son las menos preferidas
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: los datos de entrada junto con el postprocesado, apareciendo primero el partido mas votado, que es a su vez el menos favorito por tener menos postprocesado
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 5 },
+                {  'number': 3,'option': 'Option 3', 'votes': 1 },
+                
+            ]
+        }
+
+        expected_result = [
+            { 'number': 2,'option': 'Option 2', 'votes': 5,  'postproc': 2995 },
+            { 'number': 1,'option': 'Option 1', 'votes': 2,  'postproc': 2998 },
+            { 'number': 3,'option': 'Option 3', 'votes': 1, 'postproc': 2999 },
+        ]
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result) 
+        
+    def test_order_noVotes(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos,en esta ocasion no hay votos
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: los datos de entrada junto con el postprocesado, apareciendo primero el partido mas votado, que es a su vez el menos favorito por tener menos postprocesado
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 0 },
+                {  'number': 2,'option': 'Option 2', 'votes': 0 },
+                {  'number': 3,'option': 'Option 3', 'votes': 0 },
+                
+            ]
+        }
+
+        expected_result = {
+            'message': 'Los escaños son insuficientes'
+        }
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+    def test_order_error(self):
+        """
+            * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen y por tanto son las menos preferidas
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Codigo 404
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 5 },
+                {  'number': 3,'option': 'Option 3', 'votes': 1 },
+                
+            ]
+        }
+
+        response = self.client.post('/postproci/', data, format='json')
+        self.assertEqual(response.status_code, 404)
+
+    def test_order_tie_littleVotes(self):
+        """
+            * Definición: Test para mostrar que aquellas opciones con más votos. En esta ocasión, hay
+            empate (entre todas las opciones) a una cantidad de votos menor a la suma de todas
+            las puntuaciones posibles a recibir por cada opción
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Código 200 con mensaje de que no hay escaños suficientes para repartir
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 2 },
+                {  'number': 3,'option': 'Option 3', 'votes': 2 },
+                
+            ]
+        }
+
+        expected_result = {
+            'message': 'Los escaños son insuficientes'
+        }
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+   
+
