@@ -388,7 +388,26 @@ class PostProcView(APIView):
 
         #Se ordenan las opciones según los escaños
         options.sort(key=lambda x: -x['escanio'])
-        return Response(options)
+        out = options
+
+        a = len(options)-1
+        b = 0
+        c = True
+
+        while b < a:
+            if(options[b]['votes'] == options[b+1]['votes']):
+                c = True
+            else:
+                c=False
+                break
+            b = b+1
+
+        if(escanio == 0):
+            out = {'message': 'Los escaños son insuficientes'}
+        elif(c == True):
+            out = {'message': 'No hay votos'}
+
+        return Response(out)
 
         
 

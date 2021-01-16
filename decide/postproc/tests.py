@@ -1084,14 +1084,9 @@ class PostProcTestCase(APITestCase):
             ]
         }
         
-        expected_result = [
-            { "option": "Option 1", "number": 1, "votes": 0, "escanio": 0 },
-            { "option": "Option 5", "number": 5, "votes": 0, "escanio": 0 },
-            { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
-            { "option": "Option 4", "number": 4, "votes": 0, "escanio": 0 },
-            { "option": "Option 2", "number": 2, "votes": 0, "escanio": 0 },
-            { "option": "Option 6", "number": 6, "votes": 0, "escanio": 0 },
-        ]
+        expected_result = {
+            'message': 'No hay votos'
+        }
    
         response = self.client.post("/postproc/", data, format="json")
         self.assertEqual(response.status_code, 200)
@@ -1184,7 +1179,7 @@ class PostProcTestCase(APITestCase):
         response = self.client.post('/postproci/', data, format='json')
         self.assertEqual(response.status_code, 404)
 
-        def test_order_tie_littleVotes(self):
+    def test_order_tie_littleVotes(self):
         """
             * Definición: Test para mostrar que aquellas opciones con más votos. En esta ocasión, hay
             empate (entre todas las opciones) a una cantidad de votos menor a la suma de todas
