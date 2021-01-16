@@ -249,6 +249,52 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+    def test_bordaMulti(self):
+        """
+            * Definicion: Test con muchos grupos de votación y votos
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+                - Group: Grupo de votación al que pertenece
+            * Salida: los datos de entrada con un nuevo parámetro llamado total
+            que supone el valor de esa opción tras aplicar el algoritmo
+        """        
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 105, "group":"g1" },
+                { "option": "Option 1", "number": 1, "votes": 453, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 242, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 67, "group":"g2" },
+                { "option": "Option 2", "number": 5, "votes": 23, "group":"g2" },
+                { "option": "Option 3", "number": 6, "votes": 45, "group":"g2" },
+                { "option": "Option 1", "number": 7, "votes": 230, "group":"g3" },
+                { "option": "Option 2", "number": 8, "votes": 334, "group":"g3" },
+                { "option": "Option 3", "number": 9, "votes": 234, "group":"g3" }
+                
+            ]
+        }
+
+        expected_result = [
+                { "option": "Option 1", "number": 1, "votes": 453, "group":"g1", "total":2400},
+                { "option": "Option 2", "number": 8, "votes": 334, "group":"g3", "total":2394},
+                { "option": "Option 3", "number": 3, "votes": 242, "group":"g1", "total":1600},
+                { "option": "Option 3", "number": 9, "votes": 234, "group":"g3", "total":1596},
+                { "option": "Option 2", "number": 2, "votes": 105, "group":"g1", "total":800},
+                { "option": "Option 1", "number": 7, "votes": 230, "group":"g3", "total":798},
+                { "option": "Option 1", "number": 4, "votes": 67, "group":"g2","total":405},
+                { "option": "Option 3", "number": 6, "votes": 45, "group":"g2", "total":270},
+                { "option": "Option 2", "number": 5, "votes": 23, "group":"g2", "total":135}
+                
+            ]
+
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
     
     def test_order(self):
         """
