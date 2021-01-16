@@ -259,9 +259,6 @@ class PostProcView(APIView):
                 # Cuenta regresiva de los escanios
                 escanios -= 1
         
-        if(len(options) < 2):
-            out = {'message': 'No hay opciones suficientes'}
-        
         return out
 
     def checkPorcentajeParidad(self, hombres, mujeres):
@@ -385,9 +382,6 @@ class PostProcView(APIView):
                 x = x + 1
 
                 escanyos = escanyos - 1 
-         
-        if(len(options) < 2):
-            out = {'message': 'No hay opciones suficientes'}
 
         return out  
     
