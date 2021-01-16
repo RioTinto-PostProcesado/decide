@@ -44,6 +44,14 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
 
     def test_identity_littleOptions(self):
+        """
+            * Definición: Test de algoritmo de identidad con una votación con sólo una opción
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opción
+                - Votes: Número de votos que recibe en la votación
+            * Salida: Mensaje de error indicando que no hay opciones suficientes
+        """
         data = {
             'type': 'IDENTITY',
             'options': [
