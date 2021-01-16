@@ -1144,4 +1144,36 @@ class PostProcTestCase(APITestCase):
 
         response = self.client.post('/postproci/', data, format='json')
         self.assertEqual(response.status_code, 404)
+
+        def test_order_tie_littleVotes(self):
+        """
+            * Definición: Test para mostrar que aquellas opciones con más votos. En esta ocasión, hay
+            empate (entre todas las opciones) a una cantidad de votos menor a la suma de todas
+            las puntuaciones posibles a recibir por cada opción
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: Código 200 con mensaje de que no hay escaños suficientes para repartir
+        """        
+
+        data = {
+            'type': 'ORDER',
+            'options': [
+                {  'number': 1,'option': 'Option 1', 'votes': 2 },
+                {  'number': 2,'option': 'Option 2', 'votes': 2 },
+                {  'number': 3,'option': 'Option 3', 'votes': 2 },
+                
+            ]
+        }
+
+        expected_result = {
+            'message': 'Los escaños son insuficientes'
+        }
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
    
