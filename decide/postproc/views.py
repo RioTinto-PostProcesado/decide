@@ -16,6 +16,10 @@ class PostProcView(APIView):
             })
 
         out.sort(key=lambda x: -x['postproc'])
+
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return Response(out)
 
     def order(self, options):
@@ -76,6 +80,8 @@ class PostProcView(APIView):
 
         if d:
             out = {'message': 'Los escaños son insuficientes'}
+        elif(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
 
         return out
 
@@ -108,6 +114,10 @@ class PostProcView(APIView):
 
         # Ordenamos todos los votos según su valot total tras aplicar borda
         res.sort(key=lambda x: x['total'], reverse=True)
+
+        if(len(options) < 2):
+            res = {'message': 'No hay opciones suficientes'}
+
         return Response(res)
 
     def sainteLague(self, options, seats):
@@ -177,6 +187,9 @@ class PostProcView(APIView):
                 1  # Asigna un escaño al partido correspondiente
 
             asientos = asientos - 1  # Descuenta un asiento a los totales
+        
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
 
         return out
 
@@ -245,6 +258,10 @@ class PostProcView(APIView):
 
                 # Cuenta regresiva de los escanios
                 escanios -= 1
+        
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+        
         return out
 
     def checkPorcentajeParidad(self, hombres, mujeres):
@@ -334,6 +351,9 @@ class PostProcView(APIView):
 
                 numeroEscanyos = numeroEscanyos - 1
 
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return out
 
     def sin_paridad(self, options):
@@ -365,6 +385,9 @@ class PostProcView(APIView):
                 x = x + 1
 
                 escanyos = escanyos - 1 
+         
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
 
         return out  
     
@@ -408,6 +431,8 @@ class PostProcView(APIView):
             out = {'message': 'Los escaños son insuficientes'}
         elif(c == True):
             out = {'message': 'No hay votos'}
+        elif(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
 
         return out
 
