@@ -6,7 +6,7 @@ addons:
   postgresql: "9.4"
 before_script:
   - psql -U postgres -c "create user decide password 'decide'"
-  - psql -U postgres -c "create database test_decide owner decide"
+  - psql -U postgres -c "create database test_decide_1 owner decide"
   - psql -U postgres -c "ALTER USER decide CREATEDB"
 language: python
 python:
@@ -16,6 +16,6 @@ install:
   - pip install codacy-coverage
 script:
   - cd decide
-  - coverage run --branch --source=. ./manage.py test --keepdb --with-xunit
+  - coverage run --branch --source=. ./manage.py test postproc
   - coverage xml
   - python-codacy-coverage -r coverage.xml
