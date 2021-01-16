@@ -294,6 +294,32 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+    def test_SainteLague_littleOptions(self):
+        """
+            * Definición: Test de algoritmo de Sainte Lague con una votación con sólo una opción
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opción
+                - Votes: Número de votos que recibe en la votación
+            * Salida: Mensaje de error indicando que no hay opciones suficientes
+        """
+        data = {
+            'type': 'SAINTE',
+            'seats': 12,
+            'options': [
+                {'option': 'Partido 1', 'number': 1, 'votes': 50},
+            ]
+        }
+
+        expected_result = {
+            'message': 'No hay opciones suficientes'}
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
 
     def testParidad2(self):
         """
