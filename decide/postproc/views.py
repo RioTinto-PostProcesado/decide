@@ -368,7 +368,7 @@ class PostProcView(APIView):
 
         return out  
     
-    def dhondt(self, options, escanio):
+    def dhondt(self, options, seats):
         """
             * Definicion: Asigna escaños en las listas electorales
             * Entrada: Json de la votación asignando los escaños según corresponda
@@ -378,17 +378,19 @@ class PostProcView(APIView):
         
         #Para cada opcion se le añaden escaños
         for opt in options:
-            opt['escanio'] = 0
+            opt['postproc'] = 0
 
         #Para asignar escaños, se realiza la división entre los vosotros que tiene cada opción y los escaños (inicialmente se divide entre 1)
         #El mayor cociente se lleva el escaño
-        for i in range(escanio):
+        for i in range(seats):
             max(options, 
-                key = lambda x : x['votes'] / (x['escanio'] + 1.0))['escanio'] += 1
+                key = lambda x : x['votes'] / (x['postproc'] + 1.0))['postproc'] += 1
 
         #Se ordenan las opciones según los escaños
-        options.sort(key=lambda x: -x['escanio'])
+        options.sort(key=lambda x: -x['postproc'])
         out = options
+
+        print(out)
 
         a = len(options)-1
         b = 0
@@ -402,12 +404,12 @@ class PostProcView(APIView):
                 break
             b = b+1
 
-        if(escanio == 0):
+        if(seats == 0):
             out = {'message': 'Los escaños son insuficientes'}
         elif(c == True):
             out = {'message': 'No hay votos'}
 
-        return Response(out)
+        return out
 
         
 
@@ -456,8 +458,7 @@ class PostProcView(APIView):
             return Response(self.order(options))
 
         elif typeOfData == 'DHONDT':
-            escanio = int(float(request.data.get('escanio', int )))
-            return self.dhondt(options, escanio)
+            return Response(self.dhondt(options, s))
         
         return Response({})
         

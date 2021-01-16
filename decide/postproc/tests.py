@@ -955,7 +955,7 @@ class PostProcTestCase(APITestCase):
         
         data = {
             "type": "DHONDT",
-            "escanio": "8",
+            "seats": 8,
             "options": [
                 { "option": "Option 1", "number": 1, "votes": 5 },
                 { "option": "Option 2", "number": 2, "votes": 0 },
@@ -967,18 +967,18 @@ class PostProcTestCase(APITestCase):
         }
         
         expected_result = [
-            { "option": "Option 1", "number": 1, "votes": 5, "escanio": 3 },
-            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 3 },
-            { "option": "Option 3", "number": 3, "votes": 3, "escanio": 1 },
-            { "option": "Option 4", "number": 4, "votes": 2, "escanio": 1 },
-            { "option": "Option 2", "number": 2, "votes": 0, "escanio": 0 },
-            { "option": "Option 6", "number": 6, "votes": 1, "escanio": 0 },
+            { "option": "Option 1", "number": 1, "votes": 5, "postproc": 3 },
+            { "option": "Option 5", "number": 5, "votes": 5, "postproc": 3 },
+            { "option": "Option 3", "number": 3, "votes": 3, "postproc": 1 },
+            { "option": "Option 4", "number": 4, "votes": 2, "postproc": 1 },
+            { "option": "Option 2", "number": 2, "votes": 0, "postproc": 0 },
+            { "option": "Option 6", "number": 6, "votes": 1, "postproc": 0 },
         ]
 
 
         data = {
             "type": "DHONDT",
-            "escanio": 10,
+            "seats": 10,
             "options": [
                 { "option": "Option 1", "number": 1, "votes": 20 },
                 { "option": "Option 2", "number": 2, "votes": 11 },
@@ -989,11 +989,11 @@ class PostProcTestCase(APITestCase):
         }
         
         expected_result = [
-            { "option": "Option 1", "number": 1, "votes": 20, "escanio": 5 },
-            { "option": "Option 2", "number": 2, "votes": 11, "escanio": 2 },
-            { "option": "Option 4", "number": 4, "votes": 10, "escanio": 2 },
-            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 1 },
-            { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
+            { "option": "Option 1", "number": 1, "votes": 20, "postproc": 5 },
+            { "option": "Option 2", "number": 2, "votes": 11, "postproc": 2 },
+            { "option": "Option 4", "number": 4, "votes": 10, "postproc": 2 },
+            { "option": "Option 5", "number": 5, "votes": 5, "postproc": 1 },
+            { "option": "Option 3", "number": 3, "votes": 0, "postproc": 0 },
         ]
    
         response = self.client.post("/postproc/", data, format="json")
@@ -1014,7 +1014,7 @@ class PostProcTestCase(APITestCase):
 
         data = {
             "type": "DHONDT",
-            "escanio": 0,
+            "seats": 0,
             "options": [
                 { "option": "Option 1", "number": 1, "votes": 10 },
                 { "option": "Option 2", "number": 2, "votes": 0 },
@@ -1073,7 +1073,7 @@ class PostProcTestCase(APITestCase):
 
         data = {
             "type": "DHONDT",
-            "escanio": "8",
+            "seats": 8,
             "options": [
                 { "option": "Option 1", "number": 1, "votes": 0 },
                 { "option": "Option 2", "number": 2, "votes": 0 },
@@ -1093,7 +1093,7 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
-
+    
     def test_order(self):
         """
             * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen y por tanto son las menos preferidas
