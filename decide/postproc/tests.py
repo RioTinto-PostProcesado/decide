@@ -156,6 +156,7 @@ class PostProcTestCase(APITestCase):
             ]
         }
 
+
         expected_result = [
             {'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 5, 'candidatos': [
                 {'sexo': 'hombre', 'id': '1'}, {'sexo': 'mujer', 'id': '2'}, {
@@ -184,6 +185,7 @@ class PostProcTestCase(APITestCase):
                 - Candidatos: Sexo e ID de los candidatos
             * Salida: Codigo 200 y json de la paridad
         """
+
         data = {
             'type': 'PARIDAD',
             'options': [
@@ -193,6 +195,7 @@ class PostProcTestCase(APITestCase):
                  ]}
             ]
         }
+
 
         expected_result = [
             {'option': 'Partido Unico', 'number': 1, 'votes': 5, 'postproc': 1, 'candidatos': [
@@ -205,10 +208,51 @@ class PostProcTestCase(APITestCase):
         ]
 
         response = self.client.post('/postproc/', data, format='json')
+
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
+
+    def test_borda(self):
+        """
+            * Definicion: Test que verifica si el algoritmo borda funciona correctamente
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+                - Group: Grupo de votación al que pertenece
+            * Salida: los datos de entrada con un nuevo parámetro llamado total
+            que supone el valor de esa opción tras aplicar el algoritmo
+        """        
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1" },
+                { "option": "Option 1", "number": 1, "votes": 5, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g2" },
+                { "option": "Option 2", "number": 5, "votes": 3, "group":"g2" },
+                { "option": "Option 3", "number": 6, "votes": 2, "group":"g2" }
+            ]
+        }
+        expected_result = [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1", "total":66 },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1", "total":44},
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g2", "total": 39},
+                { "option": "Option 2", "number": 5, "votes": 3, "group":"g2", "total": 26},
+                { "option": "Option 1", "number": 1, "votes": 5, "group":"g1", "total": 22},
+                { "option": "Option 3", "number": 6, "votes": 2, "group":"g2", "total": 13}
+                
+            ]
+
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
 
     def test_SainteLague1(self):
         data = {
@@ -251,6 +295,7 @@ class PostProcTestCase(APITestCase):
                 {'option': 'Partido 5', 'number': 5, 'votes': 56},
                 {'option': 'Partido 6', 'number': 6, 'votes': 170},
                 {'option': 'Partido 7', 'number': 7, 'votes': 90},
+
             ]
         }
 
@@ -315,6 +360,64 @@ class PostProcTestCase(APITestCase):
             'message': 'No hay opciones suficientes'}
 
         response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
+
+    def test_bordaWrongPath(self):
+        """
+            * Definicion: Test que verifica que obtenemos un not found al realizar
+            un post a una página que no existe
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+                - Group: Grupo de votación al que pertenece
+            * Salida: 404, not found
+        """        
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1" },
+                { "option": "Option 1", "number": 1, "votes": 5, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g2" },
+                { "option": "Option 2", "number": 5, "votes": 3, "group":"g2" },
+                { "option": "Option 3", "number": 6, "votes": 2, "group":"g2" }  
+            ]
+        }
+
+        response = self.client.post("/postprocesado/", data, format="json")
+        self.assertEqual(response.status_code, 404)
+    
+    def test_bordaNoType(self):
+        """
+            * Definicion: Test donde no se especifica type en el json de entrada
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+                - Group: Grupo de votación al que pertenece
+            * Salida: los datos de entrada tras aplicarle el type por defecto que es
+            la función identity
+        """        
+        data = {	
+            "options": [
+                { "option": "Option 2", "number": 1, "votes": 10, "group":"g1" },
+                { "option": "Option 3", "number": 2, "votes": 7, "group":"g1" },
+                { "option": "Option 1", "number": 3, "votes": 8, "group":"g1" }
+                ]
+        }
+
+        expected_result = [
+            { "option": "Option 2", "number": 1, "votes": 10, "group":"g1", "postproc":10},
+            { "option": "Option 1", "number": 3, "votes": 8, "group":"g1" , "postproc":8},
+            { "option": "Option 3", "number": 2, "votes": 7, "group":"g1" , "postproc":7} 
+            ]
+
+        response = self.client.post("/postproc/", data, format="json")
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
@@ -390,6 +493,7 @@ class PostProcTestCase(APITestCase):
                 ,{'sexo':'mujer','id':'4'}
                 ,{'sexo':'mujer','id':'5'}
                 ]}
+
             ]
         }
 
@@ -455,6 +559,40 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+
+    def test_bordaGrupoUnico(self):
+        """
+            * Definicion: Test donde solo existe un grupo de votación
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+                - Group: Grupo de votación al que pertenece
+            * Salida: los datos de entrada con un nuevo parámetro llamado total
+            que supone el valor de esa opción tras aplicar el algoritmo
+        """        
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g1" }
+                 ]
+        }
+
+        expected_result = [
+
+                { "option": "Option 2", "number": 2, "votes": 10, "group":"g1", "total":75 },
+                { "option": "Option 1", "number": 4, "votes": 8, "group":"g1", "total": 50},
+                { "option": "Option 3", "number": 3, "votes": 7, "group":"g1", "total":25}   
+            ]
+
+        response = self.client.post("/postproc/", data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result) 
+
     def test_SainteLague4(self):
 
         """
@@ -474,10 +612,12 @@ class PostProcTestCase(APITestCase):
                 {'option': 'Partido 5', 'number': 5, 'votes': 56},
                 {'option': 'Partido 6', 'number': 6, 'votes': 120},
                 {'option': 'Partido 7', 'number': 7, 'votes': 45},
+
             ]
         }
 
         expected_result = [
+
             {'option': 'Partido 6', 'number': 6, 'votes': 120, 'postproc': 4},
             {'option': 'Partido 5', 'number': 5, 'votes': 56, 'postproc': 2},
             {'option': 'Partido 1', 'number': 1, 'votes': 50, 'postproc': 1},
@@ -488,6 +628,36 @@ class PostProcTestCase(APITestCase):
         ]
 
         response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+   
+    def test_bordaNoGroup(self):
+        """
+            * Definicion: Test donde los votos no estan agrupados
+            * Entrada: Votacion
+                - Number: id del partido
+                - Option: nombre de la opcion
+                - Votes: Numero de votos que recibe en la votación
+            * Salida: mensaje de error
+        """
+
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 10},
+                { "option": "Option 1", "number": 1, "votes": 5},
+                { "option": "Option 3", "number": 3, "votes": 7},
+                { "option": "Option 1", "number": 4, "votes": 8},
+                { "option": "Option 2", "number": 5, "votes": 3},
+                { "option": "Option 3", "number": 6, "votes": 2} 
+            ]
+        }
+
+        expected_result = {'message': 'Los votos no se pueden agrupar'}
+
+        response = self.client.post("/postproc/", data, format="json")
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
@@ -519,6 +689,42 @@ class PostProcTestCase(APITestCase):
         response = self.client.post('/postproco/', data, format='json')
 
         self.assertEqual(response.status_code, 404)
+
+    def test_bordaMulti(self):
+        data = {
+            "type": "BORDA",	
+            "options": [
+                { "option": "Option 2", "number": 2, "votes": 105, "group":"g1" },
+                { "option": "Option 1", "number": 1, "votes": 453, "group":"g1" },
+                { "option": "Option 3", "number": 3, "votes": 242, "group":"g1" },
+                { "option": "Option 1", "number": 4, "votes": 67, "group":"g2" },
+                { "option": "Option 2", "number": 5, "votes": 23, "group":"g2" },
+                { "option": "Option 3", "number": 6, "votes": 45, "group":"g2" },
+                { "option": "Option 1", "number": 7, "votes": 230, "group":"g3" },
+                { "option": "Option 2", "number": 8, "votes": 334, "group":"g3" },
+                { "option": "Option 3", "number": 9, "votes": 234, "group":"g3" }
+                
+            ]
+        }
+        expected_result = [
+                { "option": "Option 1", "number": 1, "votes": 453, "group":"g1", "total":2400},
+                { "option": "Option 2", "number": 8, "votes": 334, "group":"g3", "total":2394},
+                { "option": "Option 3", "number": 3, "votes": 242, "group":"g1", "total":1600},
+                { "option": "Option 3", "number": 9, "votes": 234, "group":"g3", "total":1596},
+                { "option": "Option 2", "number": 2, "votes": 105, "group":"g1", "total":800},
+                { "option": "Option 1", "number": 7, "votes": 230, "group":"g3", "total":798},
+                { "option": "Option 1", "number": 4, "votes": 67, "group":"g2","total":405},
+                { "option": "Option 3", "number": 6, "votes": 45, "group":"g2", "total":270},
+                { "option": "Option 2", "number": 5, "votes": 23, "group":"g2", "total":135}
+                
+            ]
+
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
         
     def test_simple(self):
 
@@ -527,7 +733,6 @@ class PostProcTestCase(APITestCase):
             * Entrada: Json de la votacion
             * Salida: Codigo 200 y Json con el resultado de la votación
         """
-
         data = {
             'type': 'SIMPLE',
             'seats':10,
@@ -559,6 +764,8 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+
+       
     def test_simple_grande(self):
         """
             * Definicion: Comprueba que el método simple devuelva los resultados esperados 
@@ -575,6 +782,7 @@ class PostProcTestCase(APITestCase):
                 { 'option': 'Ofelia', 'number': 4, 'votes':  400},
                 { 'option': 'Super', 'number': 5, 'votes': 15000 },
                 { 'option': 'Botones Sacarino', 'number': 6, 'votes': 4100 },
+
             ]
         }
 
@@ -827,15 +1035,13 @@ class PostProcTestCase(APITestCase):
                 'paridad': [
                 ]
             }
-            
         ]
-        
-        
         response = self.client.post('/postproc/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
 
     def test_simple_littleOptions(self):
         """
@@ -862,6 +1068,7 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
     
     def test_saint_lague_sin_paridad(self):
         
@@ -1024,6 +1231,7 @@ class PostProcTestCase(APITestCase):
 
         values = response.json()
         self.assertEqual(values, expected_result)
+
 
 
     def test_dhondt(self):
@@ -1311,3 +1519,4 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
    
+

@@ -22,6 +22,7 @@ class PostProcView(APIView):
 
         return Response(out)
 
+
     def order(self, options):
         """
             * options: [
@@ -85,39 +86,71 @@ class PostProcView(APIView):
 
         return out
 
+    def groups(self, options):
+
+        """
+            * Definicion: Agrupa cada options segun su grupo de votación
+            * Entrada: Json de la votacion
+            * Salida: Diccionario cuya llave son los grupos de votación y el valor listas de candidatos
+        """
+
+        groups = set()
+        grpOptions = {}
+        
+        #Obtener grupos
+        for opt in options:
+            groups.add(opt["group"])
+             
+        #Inicializar listas de opciones
+        for group in groups:
+            grpOptions[group] = []      
+
+        #Categorizar opciones por grupo
+        for opt in options:
+            grpOptions[opt.get("group")].append(opt)
+
+        return grpOptions
+        
+
     def borda(self, options):
 
-        # Añadimos total para todas las opciones
-        for opt in options:
-            opt['total'] = 0
+        """
+            * Definicion: Aplica el algoritmo de recuento Borda 
+            * Entrada: Json de la votacion
+            * Salida: Lista de candidatos con un nuevo parametro que supone el valor de sus votos tras aplicar borda
+        """
+        #Comprobamos que options tiene el atributo groups
+        if not 'group' in options[0]:
+            res = {'message': 'Los votos no se pueden agrupar'}
+        else:
+        #Añadimos total para todas las opciones
+            for opt in options:
+                opt['total'] = 0
 
-        # Agrupamos las opciones segun su grupo de votación
-        grp = self.groups(options)
-        res = []
+        #Agrupamos las opciones segun su grupo de votación
+            grp = self.groups(options)
+            res = []
 
-        # Ordenamos las opciones según el número de votos
-        for g in grp:
-            lista = sorted(grp[g], key=lambda x: x["votes"])
-            votosTotales = 0
+        #Ordenamos las opciones según el número de votos 
+            for g in grp:
+                lista = sorted(grp[g], key = lambda x:x["votes"])
+                votosTotales = 0
 
-            # Obtenemos la suma todos los votos
-            for lis in lista:
-                votosTotales += lis["votes"]
+                #Obtenemos la suma todos los votos
+                for lis in lista:
+                    votosTotales +=  lis["votes"]
+                
+                cont = 1
 
-            cont = 1
-            # Aplicamos el algoritmo de borda
-            for l in lista:
-                tot = votosTotales * cont
-                l['total'] = tot
-                res.append(l)
-                cont += 1
-
-        # Ordenamos todos los votos según su valot total tras aplicar borda
-        res.sort(key=lambda x: x['total'], reverse=True)
-
-        if(len(options) < 2):
-            res = {'message': 'No hay opciones suficientes'}
-
+                #Aplicamos el algoritmo de borda
+                for l in lista:
+                    tot = votosTotales * cont
+                    l['total'] = tot
+                    res.append(l)
+                    cont += 1
+        
+        #Ordenamos todos los votos según su valot total tras aplicar borda
+            res.sort(key=lambda x : x['total'],reverse=True)
         return Response(res)
 
     def sainteLague(self, options, seats):
@@ -301,8 +334,7 @@ class PostProcView(APIView):
 
         # Valor del escaño es igual al número de votos entre el número de escaños
         valor_escanyo = numeroVotos/numeroEscanyos
-
-        x = 0;        
+        x = 0        
 
         #Mientras el número de escaños sea mayor a cero
         while numeroEscanyos > 0:
@@ -449,6 +481,7 @@ class PostProcView(APIView):
         options = request.data.get('options', [])
         s = request.data.get('seats')
 
+
         if typeOfData == 'IDENTITY':
             return self.identity(options)
 
@@ -481,3 +514,4 @@ class PostProcView(APIView):
         
         return Response({})
         
+
