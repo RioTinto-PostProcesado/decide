@@ -108,18 +108,21 @@ class PostProcTestCase(APITestCase):
             "type": "DHONDT",
             "escanio": 0,
             "options": [
-                { "option": "Option 1", "number": 1, "votes": 10 },
-                { "option": "Option 2", "number": 2, "votes": 0 },
+                { "option": "Option 1", "number": 1, "votes": 20 },
+                { "option": "Option 2", "number": 2, "votes": 11 },
                 { "option": "Option 3", "number": 3, "votes": 0 },
-                { "option": "Option 4", "number": 4, "votes": 1 },
-                { "option": "Option 5", "number": 5, "votes": 4 },
-                { "option": "Option 6", "number": 6, "votes": 2 },
+                { "option": "Option 4", "number": 4, "votes": 10 },
+                { "option": "Option 5", "number": 5, "votes": 5 },
             ]
         }
         
-        expected_result = {
-            'message': 'Los escaños son insuficientes'
-        }
+        expected_result = [
+            { "option": "Option 1", "number": 1, "votes": 20, "escanio": 0 },
+            { "option": "Option 2", "number": 2, "votes": 11, "escanio": 0 },
+            { "option": "Option 3", "number": 3, "votes": 0, "escanio": 0 },
+            { "option": "Option 4", "number": 4, "votes": 10, "escanio": 0 },
+            { "option": "Option 5", "number": 5, "votes": 5, "escanio": 0 },
+        ]
         
         response = self.client.post("/postproc/", data, format="json")
         self.assertEqual(response.status_code, 200)
@@ -151,7 +154,7 @@ class PostProcTestCase(APITestCase):
         
         response = self.client.post('/postproci/', data, format='json')
         self.assertEqual(response.status_code, 404)
-
+    
     def test_order(self):
         """
             * Definicion: Test para mostrar que aquellas opciones con más votos, son las que menos postprocesado tienen y por tanto son las menos preferidas
@@ -204,9 +207,11 @@ class PostProcTestCase(APITestCase):
             ]
         }
 
-        expected_result = {
-            'message': 'Los escaños son insuficientes'
-        }
+        expected_result = [
+            { 'number': 1,'option': 'Option 1', 'votes': 0,  'postproc': 3000 },
+            { 'number': 2,'option': 'Option 2', 'votes': 0,  'postproc': 3000 },
+            { 'number': 3,'option': 'Option 3', 'votes': 0, 'postproc': 3000 },
+        ]
 
         response = self.client.post('/postproc/', data, format='json')
         self.assertEqual(response.status_code, 200)
