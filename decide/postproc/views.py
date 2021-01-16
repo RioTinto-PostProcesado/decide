@@ -58,7 +58,7 @@ class PostProcView(APIView):
         a = 0
         b = len(options)
         c = 0
-        d = True
+        d = False
         e = 0
 
         while b != 0:
