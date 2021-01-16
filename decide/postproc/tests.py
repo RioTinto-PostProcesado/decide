@@ -43,6 +43,23 @@ class PostProcTestCase(APITestCase):
         values = response.json()
         self.assertEqual(values, expected_result)
 
+    def test_identity_littleOptions(self):
+        data = {
+            'type': 'IDENTITY',
+            'options': [
+                {'option': 'Option 1', 'number': 1, 'votes': 5},
+            ]
+        }
+
+        expected_result = {
+            'message': 'No hay opciones suficientes'}
+
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+
+        values = response.json()
+        self.assertEqual(values, expected_result)
+
     def testNoParidad(self):
         """
             * Definicion: Test negativo para verificar que no acepta una votacion que no cumple paridad
