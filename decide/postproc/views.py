@@ -30,7 +30,9 @@ class PostProcView(APIView):
             * Definición: Método que devolverá el resultado de las votaciones, asignando mayor valor de
             postprocesado a aquellas opciones con las posiciones más altas en votación. La votación de orden
             consistirá en ordenar las opciones sugeridas siguiendo un criterio determinado (por ejemplo,
-            preferencia).
+            preferencia). En caso de que todas las opciones empataran por una cantidad de votos menor a la suma
+            de todas las puntuaciones posibles (por ejemplo, para 3 opciones, menos de 6 votos), devolverá un
+            mensaje de error.
             * Entrada: votos totales por cada eleccion (es decir, la suma total de los puestos obtenidos por
             cada opción en las votaciones, de forma que las opciones con menos votos serán las que obtuvieran
             posiciones más altas).
@@ -50,11 +52,30 @@ class PostProcView(APIView):
         max = len(options)*1000
 
         a = 0
+        b = len(options)
+        c = 0
+        d = True
+        e = 0
+
+        while b != 0:
+            c = c+b
+            b = b-1
+
+        while e < (len(out)-1):
+            if(out[e]['votes'] == out[e+1]['votes'] and out[e]['votes'] < c):
+                d=True
+            else:
+                d=False
+                break
+            e = e+1
 
         while a < len(out):
             postproc_a = max-out[a]['votes']
             out[a]['postproc'] = postproc_a
             a = a+1
+
+        if d:
+            out = {'message': 'Los escaños son insuficientes'}
 
         return out
 
@@ -416,7 +437,8 @@ class PostProcView(APIView):
             return Response(self.order(options))
 
         elif typeOfData == 'DHONDT':
-            return self.dhondt(options, s)
+            escanio = int(float(request.data.get('escanio', int )))
+            return self.dhondt(options, escanio)
         
         return Response({})
         
