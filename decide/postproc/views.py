@@ -439,8 +439,6 @@ class PostProcView(APIView):
         options.sort(key=lambda x: -x['postproc'])
         out = options
 
-        print(out)
-
         a = len(options)-1
         b = 0
         c = True
