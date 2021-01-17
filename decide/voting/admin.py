@@ -4,7 +4,7 @@ from django.utils import timezone
 from .models import QuestionOption
 from .models import Question
 from .models import Voting
-
+from .models import YesOrNoQuestion
 from .filters import StartedFilter
 
 
@@ -35,6 +35,9 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [QuestionOptionInline]
 
 
+class YesOrNoQuestionAdmin(admin.ModelAdmin):
+    pass
+
 class VotingAdmin(admin.ModelAdmin):
     list_display = ('name', 'start_date', 'end_date')
     readonly_fields = ('start_date', 'end_date', 'pub_key',
@@ -48,3 +51,5 @@ class VotingAdmin(admin.ModelAdmin):
 
 admin.site.register(Voting, VotingAdmin)
 admin.site.register(Question, QuestionAdmin)
+#Añadido register para preguntas YesOrNoQuestion
+admin.site.register(YesOrNoQuestion, YesOrNoQuestionAdmin)
