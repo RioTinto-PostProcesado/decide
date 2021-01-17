@@ -119,8 +119,10 @@ class PostProcView(APIView):
             * Entrada: Json de la votacion
             * Salida: Lista de candidatos con un nuevo parametro que supone el valor de sus votos tras aplicar borda
         """
-        #Comprobamos que options tiene el atributo groups
-        if not 'group' in options[0]:
+        #Comprobamos que options tiene el atributo groups, previa comprobación de que hay al menos 2 opciones
+        if(len(options) < 2):
+            res = {'message': 'No hay opciones suficientes'}
+        elif not 'group' in options[0]:
             res = {'message': 'Los votos no se pueden agrupar'}
         else:
         #Añadimos total para todas las opciones
