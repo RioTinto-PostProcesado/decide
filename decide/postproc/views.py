@@ -448,7 +448,7 @@ class PostProcView(APIView):
         c = True
 
         while b < a:
-            if(options[b]['votes'] == options[b+1]['votes']):
+            if(options[b]['votes'] == options[b+1]['votes'] and options[b]['votes'] == 0):
                 c = True
             else:
                 c=False
