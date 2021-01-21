@@ -16,6 +16,10 @@ class PostProcView(APIView):
             })
 
         out.sort(key=lambda x: -x['postproc'])
+
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return Response(out)
 
     def order(self, options):
@@ -30,7 +34,9 @@ class PostProcView(APIView):
             * Definición: Método que devolverá el resultado de las votaciones, asignando mayor valor de
             postprocesado a aquellas opciones con las posiciones más altas en votación. La votación de orden
             consistirá en ordenar las opciones sugeridas siguiendo un criterio determinado (por ejemplo,
-            preferencia).
+            preferencia). En caso de que todas las opciones empataran por una cantidad de votos menor a la suma
+            de todas las puntuaciones posibles (por ejemplo, para 3 opciones, menos de 6 votos), devolverá un
+            mensaje de error.
             * Entrada: votos totales por cada eleccion (es decir, la suma total de los puestos obtenidos por
             cada opción en las votaciones, de forma que las opciones con menos votos serán las que obtuvieran
             posiciones más altas).
@@ -50,43 +56,101 @@ class PostProcView(APIView):
         max = len(options)*1000
 
         a = 0
+        b = len(options)
+        c = 0
+        d = False
+        e = 0
+
+        while b != 0:
+            c = c+b
+            b = b-1
+
+        while e < (len(out)-1):
+            if(out[e]['votes'] == out[e+1]['votes'] and out[e]['votes'] < c):
+                d=True
+            else:
+                d=False
+                break
+            e = e+1
 
         while a < len(out):
             postproc_a = max-out[a]['votes']
             out[a]['postproc'] = postproc_a
             a = a+1
 
+        if d:
+            out = {'message': 'Los escaños son insuficientes'}
+        elif(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return out
 
+    def groups(self, options):
+
+        """
+            * Definicion: Agrupa cada options segun su grupo de votación
+            * Entrada: Json de la votacion
+            * Salida: Diccionario cuya llave son los grupos de votación y el valor listas de candidatos
+        """
+
+        groups = set()
+        grpOptions = {}
+        
+        #Obtener grupos
+        for opt in options:
+            groups.add(opt["group"])
+             
+        #Inicializar listas de opciones
+        for group in groups:
+            grpOptions[group] = []      
+
+        #Categorizar opciones por grupo
+        for opt in options:
+            grpOptions[opt.get("group")].append(opt)
+
+        return grpOptions
+        
     def borda(self, options):
 
-        # Añadimos total para todas las opciones
-        for opt in options:
-            opt['total'] = 0
+        """
+            * Definicion: Aplica el algoritmo de recuento Borda 
+            * Entrada: Json de la votacion
+            * Salida: Lista de candidatos con un nuevo parametro que supone el valor de sus votos tras aplicar borda
+        """
+        #Comprobamos que options tiene el atributo groups, previa comprobación de que hay al menos 2 opciones
+        if(len(options) < 2):
+            res = {'message': 'No hay opciones suficientes'}
+        elif not 'group' in options[0]:
+            res = {'message': 'Los votos no se pueden agrupar'}
+        else:
+        #Añadimos total para todas las opciones
+            for opt in options:
+                opt['total'] = 0
 
-        # Agrupamos las opciones segun su grupo de votación
-        grp = self.groups(options)
-        res = []
+        #Agrupamos las opciones segun su grupo de votación
+            grp = self.groups(options)
+            res = []
 
-        # Ordenamos las opciones según el número de votos
-        for g in grp:
-            lista = sorted(grp[g], key=lambda x: x["votes"])
-            votosTotales = 0
+        #Ordenamos las opciones según el número de votos 
+            for g in grp:
+                lista = sorted(grp[g], key = lambda x:x["votes"])
+                votosTotales = 0
 
-            # Obtenemos la suma todos los votos
-            for lis in lista:
-                votosTotales += lis["votes"]
+                #Obtenemos la suma todos los votos
+                for lis in lista:
+                    votosTotales +=  lis["votes"]
+                
+                cont = 1
 
-            cont = 1
-            # Aplicamos el algoritmo de borda
-            for l in lista:
-                tot = votosTotales * cont
-                l['total'] = tot
-                res.append(l)
-                cont += 1
-
-        # Ordenamos todos los votos según su valot total tras aplicar borda
-        res.sort(key=lambda x: x['total'], reverse=True)
+                #Aplicamos el algoritmo de borda
+                for l in lista:
+                    tot = votosTotales * cont
+                    l['total'] = tot
+                    res.append(l)
+                    cont += 1
+        
+        #Ordenamos todos los votos según su valot total tras aplicar borda
+            res.sort(key=lambda x : x['total'],reverse=True)
         return Response(res)
 
     def sainteLague(self, options, seats):
@@ -156,6 +220,9 @@ class PostProcView(APIView):
                 1  # Asigna un escaño al partido correspondiente
 
             asientos = asientos - 1  # Descuenta un asiento a los totales
+        
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
 
         return out
 
@@ -224,6 +291,7 @@ class PostProcView(APIView):
 
                 # Cuenta regresiva de los escanios
                 escanios -= 1
+        
         return out
 
     def checkPorcentajeParidad(self, hombres, mujeres):
@@ -266,8 +334,7 @@ class PostProcView(APIView):
 
         # Valor del escaño es igual al número de votos entre el número de escaños
         valor_escanyo = numeroVotos/numeroEscanyos
-
-        x = 0;        
+        x = 0        
 
         #Mientras el número de escaños sea mayor a cero
         while numeroEscanyos > 0:
@@ -313,6 +380,9 @@ class PostProcView(APIView):
 
                 numeroEscanyos = numeroEscanyos - 1
 
+        if(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return out
 
     def sin_paridad(self, options):
@@ -345,7 +415,52 @@ class PostProcView(APIView):
 
                 escanyos = escanyos - 1 
 
+        return out  
+    
+    def dhondt(self, options, seats):
+        """
+            * Definicion: Asigna escaños en las listas electorales
+            * Entrada: Json de la votación asignando los escaños según corresponda
+            * Salida: Lista de la opciones ordenadas según el número de escaños que posean,
+            de mayor a menor
+        """
+        
+        #Para cada opcion se le añaden escaños
+        for opt in options:
+            opt['postproc'] = 0
+
+        #Para asignar escaños, se realiza la división entre los vosotros que tiene cada opción y los escaños (inicialmente se divide entre 1)
+        #El mayor cociente se lleva el escaño
+        for i in range(seats):
+            max(options, 
+                key = lambda x : x['votes'] / (x['postproc'] + 1.0))['postproc'] += 1
+
+        #Se ordenan las opciones según los escaños
+        options.sort(key=lambda x: -x['postproc'])
+        out = options
+
+        a = len(options)-1
+        b = 0
+        c = True
+
+        while b < a:
+            if(options[b]['votes'] == options[b+1]['votes'] and options[b]['votes'] == 0):
+                c = True
+            else:
+                c=False
+                break
+            b = b+1
+
+        if(seats == 0):
+            out = {'message': 'Los escaños son insuficientes'}
+        elif(c == True):
+            out = {'message': 'No hay votos'}
+        elif(len(options) < 2):
+            out = {'message': 'No hay opciones suficientes'}
+
         return out
+
+        
 
     def post(self, request):
         """
@@ -363,6 +478,7 @@ class PostProcView(APIView):
         typeOfData = request.data.get('type', 'IDENTITY')
         options = request.data.get('options', [])
         s = request.data.get('seats')
+
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
@@ -391,4 +507,9 @@ class PostProcView(APIView):
         elif typeOfData == 'ORDER':
             return Response(self.order(options))
 
+        elif typeOfData == 'DHONDT':
+            return Response(self.dhondt(options, s))
+        
         return Response({})
+        
+
