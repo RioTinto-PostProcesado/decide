@@ -1520,3 +1520,31 @@ class PostProcTestCase(APITestCase):
         self.assertEqual(values, expected_result)
    
 
+    def test_identity_candidatos(self):
+        """
+            * Definición: 
+            * Entrada: Votación
+                - Number: id del partido
+                - Option: nombre de la opción
+                - Votes: Número de votos que recibe en la votación
+                - Candidatos: Numero de candidatos por partido
+            * Salida: Mensaje de error indicando que no hay candidatos suficientes
+        """
+        data = {
+            'type': 'DEFENSA',
+            'options': [
+                {'option': 'Partido 1', 'number': 1, 'votes': 5, 'candidatos': [
+                 {'sexo':'mujer','id':'1'}
+                ,{'sexo':'mujer','id':'3'}
+                ]}
+            ]
+        }
+    
+        expected_result = {
+            'message': 'No hay candidatos suficientes'}
+    
+        response = self.client.post('/postproc/', data, format='json')
+        self.assertEqual(response.status_code, 200)
+    
+        values = response.json()
+        self.assertEqual(values, expected_result)
