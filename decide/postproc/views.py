@@ -460,6 +460,25 @@ class PostProcView(APIView):
 
         return out
 
+
+    def identityRestriccion(self, options):
+        out = []
+    
+        for opt in options:
+            out.append({
+                **opt,
+                'postproc': opt['votes'],
+            })
+    
+        out.sort(key=lambda x: -x['postproc'])
+            
+        for opt in options:
+            if(len(opt['candidatos']) < 3):
+                out = {'message': 'No hay candidatos suficientes'}
+                break
+    
+        return Response(out)
+
         
 
     def post(self, request):
@@ -482,6 +501,9 @@ class PostProcView(APIView):
 
         if typeOfData == 'IDENTITY':
             return self.identity(options)
+
+        if typeOfData == 'DEFENSA':
+            return self.identityRestriccion(options)
 
         elif typeOfData == 'BORDA':
             return self.borda(options)
